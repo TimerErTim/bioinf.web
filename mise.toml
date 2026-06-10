@@ -1,0 +1,20 @@
+[tools]
+mysql = "latest"
+
+[env]
+# Define repository-relative paths
+MYSQL_REPO_ROOT = "{{config_root}}"
+MYSQL_DATA_DIR = "{{config_root}}/data"
+MYSQL_UNIX_SOCKET = "{{config_root}}/data/mysql.sock"
+MYSQL_PID_FILE = "{{config_root}}/data/mysql.pid"
+
+# Database Configuration & Credentials
+MYSQL_TCP_PORT = "33060" # Use a non-standard port to avoid global conflicts
+MYSQL_USER = "user"
+MYSQL_PASSWORD = "passwd123"
+MYSQL_DATABASE = "tina"
+
+[tasks."run:db"]
+description = "Starts the local MySQL server"
+interactive = true
+file = "run_db.sh"
