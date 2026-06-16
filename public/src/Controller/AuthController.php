@@ -69,7 +69,7 @@ final class AuthController
         }
 
         $this->users->create($username, password_hash($password, PASSWORD_DEFAULT));
-        Flash::success('Registrierung ok — bitte einloggen.');
+        Flash::success('Registrierung erfolgreich. Bitte einloggen.');
         View::redirect('/login');
     }
 

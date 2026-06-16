@@ -1,4 +1,4 @@
-# WEB4 PHP — Game of Thrones Zitate: Arbeits- und Aufgabenspezifikation
+# WEB4 PHP - Game of Thrones Zitate: Arbeits- und Aufgabenspezifikation
 
 **Team:** 4  
 **Semester:** SS 2026  
@@ -10,7 +10,7 @@
 
 ## 1. Ziel und Vision
 
-Es wird eine **self-contained PHP-Webanwendung** entwickelt, die berühmte **Game-of-Thrones-Zitate** präsentiert. Zu jedem Zitat können Besucher zugehörige **Kommentare** einsehen. Eingeloggte Nutzer können Kommentare verfassen, eigene Kommentare bearbeiten und löschen. Administratoren verwalten Benutzer und können fremde Kommentare löschen — aber nicht bearbeiten.
+Es wird eine **eigenständige PHP-Webanwendung** entwickelt, die berühmte **Game-of-Thrones-Zitate** präsentiert. Zu jedem Zitat können Besucher zugehörige **Kommentare** einsehen. Eingeloggte Nutzer können Kommentare verfassen, eigene Kommentare bearbeiten und löschen. Administratoren verwalten Benutzer und können fremde Kommentare löschen, aber nicht bearbeiten.
 
 Die Anwendung erfüllt die Anforderungen der [Projektangabe](../WEB4_Projekt_Angabe.md): MVC-Architektur, PDO-Datenbankzugriff, rollenbasierte Interaktion, vollständiges CRUD für mindestens eine Ressource, serverseitige Validierung sowie XSS-/SQL-Injection-Schutz.
 
@@ -47,17 +47,17 @@ Die Anwendung erfüllt die Anforderungen der [Projektangabe](../WEB4_Projekt_Ang
 |---|:---:|:---:|:---:|
 | Zitat-Übersicht anzeigen | ✓ | ✓ | ✓ |
 | Zitat-Detail inkl. Kommentare anzeigen | ✓ | ✓ | ✓ |
-| Registrierung | ✓ | — | — |
-| Login / Logout | ✓ / — | ✓ | ✓ |
-| Kommentar schreiben | — | ✓ | ✓ |
-| Eigenen Kommentar bearbeiten | — | ✓ | ✓ |
-| Eigenen Kommentar löschen | — | ✓ | ✓ |
-| Fremden Kommentar löschen | — | — | ✓ |
-| Fremden Kommentar bearbeiten | — | — | **✗** |
-| Zitat anlegen / bearbeiten / löschen | — | — | ✓ |
-| Benutzerverwaltung (Liste, Löschen, Rolle ändern) | — | — | ✓ |
-| Sich selbst löschen | — | ✓* | ✓* |
-| Eigene Admin-Rolle entziehen (Selbst-Demotion) | — | — | **✗** (Schutz) |
+| Registrierung | ✓ | - | - |
+| Login / Logout | ✓ / - | ✓ | ✓ |
+| Kommentar schreiben | - | ✓ | ✓ |
+| Eigenen Kommentar bearbeiten | - | ✓ | ✓ |
+| Eigenen Kommentar löschen | - | ✓ | ✓ |
+| Fremden Kommentar löschen | - | - | ✓ |
+| Fremden Kommentar bearbeiten | - | - | **✗** |
+| Zitat anlegen / bearbeiten / löschen | - | - | ✓ |
+| Benutzerverwaltung (Liste, Löschen, Rolle ändern) | - | - | ✓ |
+| Sich selbst löschen | - | ✓* | ✓* |
+| Eigene Admin-Rolle entziehen (Selbst-Demotion) | - | - | **✗** (Schutz) |
 
 \* Selbstlöschung ist optional; falls implementiert, darf der **letzte Admin** nicht gelöscht werden.
 
@@ -234,7 +234,7 @@ public/
 
 ### 6.4 Konfiguration Datenbank
 
-**XAMPP / Abgabe:** Standard laut Projektangabe — Port `3306`, DB-Name `team_4`, User `fh_webphp`, Passwort `fh_webphp`.
+**XAMPP / Abgabe:** Standard laut Projektangabe: Port `3306`, DB-Name `team_4`, User `fh_webphp`, Passwort `fh_webphp`.
 
 `config.php` enthält diese Werte. Optional kann `config.local.php` den Port überschreiben.
 
@@ -259,7 +259,7 @@ public/
 ```
 
 Beziehungen:
-- `comments.user_id` → `users.id` (**ON DELETE SET NULL** — gelöschte Autoren werden in der UI als `<deleted>` angezeigt)
+- `comments.user_id` → `users.id` (**ON DELETE SET NULL**, gelöschte Autoren werden in der UI als `<deleted>` angezeigt)
 - `comments.quote_id` → `quotes.id` (**ON DELETE CASCADE**)
 
 ### 7.2 Tabellendefinitionen
@@ -355,7 +355,7 @@ Beziehungen:
 - Einheitlicher Header/Footer via `views/layouts/main.php`
 - Flash-Messages prominent unterhalb der Navigation
 - Formulare: Labels, Platzhalter, `required`-Attribut nur als UX-Hinweis (echte Prüfung serverseitig)
-- Leere Zustände: „Noch keine Kommentare — sei der Erste!" (nur wenn eingeloggt)
+- Leere Zustände: „Noch keine Kommentare. Sei der Erste!" (nur wenn eingeloggt)
 
 ### 9.3 Zitat-Detailseite (Wireframe)
 
@@ -364,7 +364,7 @@ Beziehungen:
 │  [Logo/Titel]              Nav: … Login …  │
 ├────────────────────────────────────────────┤
 │  „Zitat-Text …"                            │
-│  — Sprecher (S01E03)                       │
+│  - Sprecher (S01E03)                       │
 ├────────────────────────────────────────────┤
 │  Kommentare (3)                            │
 │  ┌──────────────────────────────────────┐  │
@@ -403,10 +403,10 @@ Build: `typst compile --root . doc/main.typ WEB4_PHP_TEAM4.pdf`
      erDiagram ... 
      ```
 4. **Architekturbeschreibung** (textuell + Skizze: MVC-Schichten, Request-Flow)
-5. **Testfälle** — ausführlich, inkl. fehlerhafter Eingaben
+5. **Testfälle**: ausführlich, inkl. fehlerhafter Eingaben
    - Vorlage: [`doc/visualization/test_results.typ`](../doc/visualization/test_results.typ)
 6. Optional: Code-Metriken via [`doc/visualization/code_metrics.typ`](../doc/visualization/code_metrics.typ)
-7. Projektangabe als Anhang (`pdf.attach` — bereits in `main.typ` vorbereitet)
+7. Projektangabe als Anhang (`pdf.attach`, bereits in `main.typ` vorbereitet)
 
 ### 10.2 Empfohlene Kapitelstruktur im PDF
 
@@ -512,7 +512,7 @@ Jeder Testfall in der Doku dokumentieren: **ID, Vorbereitung, Schritte, Erwartet
 
 | Phase | Aufgabe | Abhängigkeiten |
 |---|---|---|
-| **1** | Projektgerüst: Front Controller, Router, Layout, Config/PDO | — |
+| **1** | Projektgerüst: Front Controller, Router, Layout, Config/PDO | - |
 | **2** | DB-Schema + SQL-Dump + Seed-Daten | Phase 1 |
 | **3** | User-Model, Registrierung, Login, Session, Logout | Phase 2 |
 | **4** | Quote-Model, Liste, Detail (read-only für Nicht-Admins) | Phase 2 |
@@ -529,7 +529,7 @@ Jeder Testfall in der Doku dokumentieren: **ID, Vorbereitung, Schritte, Erwartet
 
 | # | Frage | Vorschlag |
 |---|---|---|
-| 1 | Automatisches Login nach Registrierung? | **Nein** — Redirect zur Login-Seite mit Erfolgsmeldung |
+| 1 | Automatisches Login nach Registrierung? | **Nein**, Redirect zur Login-Seite mit Erfolgsmeldung |
 | 2 | CSRF-Tokens? | Ja, einheitlich für POST |
 | 3 | Paginierung Zitate/Kommentare? | Ab 20 Einträgen |
 | 4 | Teammitglieder | Nathalie Sonnleitner, Tim Peko |
@@ -540,8 +540,8 @@ Jeder Testfall in der Doku dokumentieren: **ID, Vorbereitung, Schritte, Erwartet
 ## 16. Referenzen
 
 - [WEB4_Projekt_Angabe.md](../WEB4_Projekt_Angabe.md)
-- [doc/main.typ](../doc/main.typ) — Dokumentations-Einstieg
+- [doc/main.typ](../doc/main.typ) - Dokumentations-Einstieg
 
 ---
 
-*Stand: 16.06.2026 — Spezifikation für Team 4, WEB4 PHP Übung SS 2026.*
+*Stand: 16.06.2026 - Spezifikation für Team 4, WEB4 PHP Übung SS 2026.*

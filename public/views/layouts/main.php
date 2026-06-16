@@ -13,7 +13,7 @@ use App\Service\AuthService;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= Html::e($title) ?> — GoT Quotes</title>
+    <title><?= Html::e($title) ?> - GoT Quotes</title>
     <link rel="stylesheet" href="/assets/css/app.css">
 </head>
 <body>
@@ -60,7 +60,7 @@ use App\Service\AuthService;
 
     <footer class="site-footer">
         <div class="container">
-            WEB4 PHP — Game of Thrones Quotes
+            WEB4 PHP - Game of Thrones Quotes
         </div>
     </footer>
 </body>

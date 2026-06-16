@@ -52,7 +52,7 @@ final class UserController
 
         $willDemote = (bool) $target['is_admin'];
         if ($willDemote && $this->users->countAdmins() <= 1) {
-            Flash::error('Letzter Admin — Rolle kann nicht entzogen werden.');
+            Flash::error('Letzter Admin. Rolle kann nicht entzogen werden.');
             View::redirect('/admin/users');
         }
 
@@ -80,7 +80,7 @@ final class UserController
         }
 
         $this->users->delete($targetId);
-        Flash::success('User gelöscht — Kommentare zeigen jetzt <deleted>.');
+        Flash::success('User gelöscht. Kommentare zeigen jetzt <deleted>.');
         View::redirect('/admin/users');
     }
 }

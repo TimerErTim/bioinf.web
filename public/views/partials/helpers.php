@@ -2,7 +2,7 @@
 
 use App\Html;
 
-// Show author name — gray <deleted> if user was removed
+// Show author name. Gray <deleted> if user was removed.
 function renderCommentAuthor(array $comment): void
 {
     if ($comment['user_id'] === null || $comment['username'] === null) {

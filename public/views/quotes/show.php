@@ -20,7 +20,7 @@ $isAdmin = AuthService::isAdmin();
 <article class="card quote-detail">
     <blockquote>„<?= Html::e($quote['text']) ?>"</blockquote>
     <p class="quote-meta">
-        — <?= Html::e($quote['speaker']) ?>
+        von <?= Html::e($quote['speaker']) ?>
         <?php if (!empty($quote['season']) && !empty($quote['episode'])): ?>
             (S<?= str_pad((string) $quote['season'], 2, '0', STR_PAD_LEFT) ?>E<?= str_pad((string) $quote['episode'], 2, '0', STR_PAD_LEFT) ?>)
         <?php endif; ?>
@@ -33,7 +33,7 @@ $isAdmin = AuthService::isAdmin();
     <?php if ($comments === []): ?>
         <p class="empty-state">
             <?php if (AuthService::check()): ?>
-                Noch keine Kommentare — sei der Erste!
+                Noch keine Kommentare. Sei der Erste!
             <?php else: ?>
                 Noch keine Kommentare.
             <?php endif; ?>

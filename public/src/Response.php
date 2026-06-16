@@ -32,7 +32,7 @@ final class Response
     public static function requireCsrf(): void
     {
         if (!Csrf::validate($_POST['_csrf'] ?? null)) {
-            Flash::error('Sicherheits-Token ungültig — bitte nochmal versuchen.');
+            Flash::error('Sicherheits-Token ungültig. Bitte nochmal versuchen.');
             View::redirect('/');
         }
     }

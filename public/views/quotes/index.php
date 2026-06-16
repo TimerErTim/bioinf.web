@@ -20,7 +20,7 @@ use App\Html;
                 „<?= Html::e(mb_strlen($quote['text']) > 120 ? mb_substr($quote['text'], 0, 120) . '…' : $quote['text']) ?>"
             </p>
             <p class="quote-meta">
-                — <?= Html::e($quote['speaker']) ?>
+                · <?= Html::e($quote['speaker']) ?>
                 <?php if (!empty($quote['season']) && !empty($quote['episode'])): ?>
                     (S<?= str_pad((string) $quote['season'], 2, '0', STR_PAD_LEFT) ?>E<?= str_pad((string) $quote['episode'], 2, '0', STR_PAD_LEFT) ?>)
                 <?php endif; ?>

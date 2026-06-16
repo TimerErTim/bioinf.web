@@ -1,4 +1,4 @@
--- WEB4 PHP Team 4 — Game of Thrones Quotes
+-- WEB4 PHP Team 4, Game of Thrones Quotes
 -- Database: team_4
 -- Default admin: username admin, password admin
 
@@ -80,15 +80,15 @@ INSERT INTO `comments` (`quote_id`, `user_id`, `content`, `created_at`) VALUES
 (1, 2, 'One of the most iconic lines in the entire series!', '2026-03-01 09:15:00'),
 (1, 3, 'Cersei was absolutely ruthless here.', '2026-03-01 10:22:00'),
 (2, 2, 'Still gives me chills every time.', '2026-03-02 11:00:00'),
-(3, 3, 'House motto turned meme — love it.', '2026-03-03 08:45:00'),
+(3, 3, 'House motto turned meme, love it.', '2026-03-03 08:45:00'),
 (4, 2, 'The Starks warned everyone and nobody listened.', '2026-03-04 16:30:00'),
 (5, 3, 'I am not crying, you are crying.', '2026-03-05 19:00:00'),
 (7, 2, 'Littlefinger''s philosophy in a nutshell.', '2026-03-06 12:10:00'),
 (7, 3, 'This quote aged perfectly for his character arc.', '2026-03-06 13:00:00'),
-(9, 2, 'Arya training flashback — perfect moment.', '2026-03-07 07:30:00'),
+(9, 2, 'Arya training flashback, perfect moment.', '2026-03-07 07:30:00'),
 (10, 3, 'Tyrion''s best line delivery, fight me.', '2026-03-08 21:15:00'),
 (11, 2, 'Life advice from the Imp.', '2026-03-09 14:00:00'),
 (12, 3, 'Short and terrifying. Classic Cersei.', '2026-03-10 18:45:00'),
 (4, 3, 'House Stark deserved better.', '2026-03-11 10:00:00'),
 (8, 2, 'Lyanna was a legend.', '2026-03-12 11:30:00'),
-(10, 2, 'Second comment on this quote — deserved.', '2026-03-13 09:00:00');
+(10, 2, 'Second comment on this quote, deserved.', '2026-03-13 09:00:00');

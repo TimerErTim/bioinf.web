@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * Entry point — every request starts here.
+ * Entry point. Every request starts here.
  */
 
 use App\Controller\Admin\QuoteController as AdminQuoteController;

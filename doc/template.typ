@@ -101,21 +101,10 @@
 }
 
 #let documentation-template(
-  title: none,
-  semester-term: "",
-  author: none,
-  aufwand-in-h: none,
-  student-id: none,
   doc,
 ) = context {
-  let title = title
-  if title == none {
-    title = document.title
-  }
-  let author = author
-  if author == none {
-    author = document.author.join(", ")
-  }
+  let title = document.title
+  let author-flat = document.author.join(", ")
 
   // Global init
   show: catppuccin.with(theme)
@@ -130,7 +119,9 @@
       Seite #cur / #tot
     ],
     header: [
-      #semester-term #h(1fr) #author
+      #title
+      #h(1fr)
+      #author-flat
     ],
   )
   set heading(numbering: "1.1.")
@@ -149,19 +140,8 @@
 
   align(center)[
     #text(17pt)[*#title*]\
-    #text(14pt)[#semester-term]
 
-    #if aufwand-in-h != none [
-      #text(13pt)[
-        Aufwand in h: #aufwand-in-h
-      ]
-    ]\
-    #text(16pt)[#author]\
-    #if student-id != none [
-      #text(13pt)[
-        s#student-id
-      ]
-    ]
+    #text(16pt)[#document.author.join("\n")]
   ]
 
   context {
