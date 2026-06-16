@@ -1,5 +1,9 @@
 [tools]
 mysql = "latest"
+typst = "0.14.2"
+
+[vars]
+team_nr = "4"
 
 [env]
 # Define repository-relative paths
@@ -10,11 +14,70 @@ MYSQL_PID_FILE = "{{config_root}}/data/mysql.pid"
 
 # Database Configuration & Credentials
 MYSQL_TCP_PORT = "33060" # Use a non-standard port to avoid global conflicts
-MYSQL_USER = "user"
-MYSQL_PASSWORD = "passwd123"
-MYSQL_DATABASE = "tina"
+MYSQL_USER = "fh_webphp"
+MYSQL_PASSWORD = "fh_webphp"
+MYSQL_DATABASE = "team_{{vars.team_nr}}"
+
 
 [tasks."run:db"]
 description = "Starts the local MySQL server"
 interactive = true
 file = "run_db.sh"
+
+[tasks.package-into-zip]
+hide = true
+quiet = true
+description = "Package specified paths (excluding .git-ignored files) into a zip file"
+usage = '''
+arg "<zipfile>" help="Name of the target zip file"
+arg "<paths>" help="One or more paths (files or folders) to include" var=#true
+flag "-s --subdir <subdir>" help="Subpath inside the zip file" 
+'''
+dir = "{{cwd}}"
+run = '''
+#!/usr/bin/env bash
+
+zipfile=$(realpath "$usage_zipfile")
+IFS=' ' read -r -a paths <<< "$usage_paths"
+subdir="${usage_subdir:-}"
+
+# Create a temporary directory for optional subdir packaging
+tmpdir=$(mktemp -d)
+targetdir="$tmpdir/$subdir"
+mkdir -p "$targetdir"
+cleanup() { rm -rf "$tmpdir"; }
+trap cleanup EXIT
+
+git ls-files -z --cached --others --exclude-standard -- "${paths[@]}" | xargs -0 cp -t "$targetdir" --parents
+
+cd "$tmpdir"
+zip -r "$zipfile" .
+'''
+
+[tasks."fmt:typst"]
+description = "Format all typst files in the project"
+#sources = ["**/*.typ"]
+tools.typstyle = "0.14.0"
+run = [
+    "typstyle -i ./ --timing",
+]
+
+[tasks."build:documentation"]
+description="Build the typst documentation"
+sources=["doc/**/*"]
+outputs=["WEB4_PHP_TEAM{{vars.team_nr}}.pdf"]
+run = [
+    "typst compile doc/main.typ WEB4_PHP_TEAM{{vars.team_nr}}.pdf"
+]
+
+[tasks."package"]
+description = "Package the documentation and the project for submission"
+depends = ["build:documentation"]
+sources = ["public/**/*", "WEB4_PHP_TEAM{{vars.team_nr}}.pdf"]
+vars.zip_file = "WEB4_PHP_TEAM{{vars.team_nr}}.zip"
+outputs = ["{{vars.zip_file}}"]
+run = [
+    "rm -f {{vars.zip_file}}",
+    "mise run package-into-zip {{vars.zip_file}} public/",
+    "mise run package-into-zip {{vars.zip_file}} -s doc/ WEB4_PHP_TEAM{{vars.team_nr}}.pdf"
+]
