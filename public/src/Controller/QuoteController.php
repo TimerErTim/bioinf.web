@@ -10,7 +10,7 @@ use App\Model\Quote;
 use App\Response;
 use App\View;
 
-// Zitat-Liste und Detailseite (öffentlich)
+// Quote list and detail page (public)
 final class QuoteController
 {
     private const PAGE_SIZE = 20;

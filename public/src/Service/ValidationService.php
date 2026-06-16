@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-// Eingaben serverseitig prüfen (Formulare)
+// Check form input on the server
 final class ValidationService
 {
     public static function username(?string $username): array

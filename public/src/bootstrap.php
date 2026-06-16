@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// Start: Config laden, Klassen automatisch einbinden, Session starten
+// Load config, autoload classes, start session
 $config = require __DIR__ . '/config.php';
 
 $localConfig = __DIR__ . '/config.local.php';

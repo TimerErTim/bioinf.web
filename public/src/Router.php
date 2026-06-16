@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-// URL → Controller-Methode
+// Maps URL to controller method
 final class Router
 {
     private array $routes = [];

@@ -12,7 +12,7 @@ use App\Service\AuthService;
 use App\Service\ValidationService;
 use App\View;
 
-// Registrierung, Login, Logout
+// Register, login, logout
 final class AuthController
 {
     private User $users;

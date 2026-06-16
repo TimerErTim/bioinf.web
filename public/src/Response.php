@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-// HTTP-Hilfsfunktionen (403, 404, POST/CSRF prüfen)
+// HTTP helpers: 403, 404, check POST and CSRF
 final class Response
 {
     public static function forbidden(): void

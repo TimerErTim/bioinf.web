@@ -6,7 +6,7 @@ namespace App\Model;
 
 use PDO;
 
-// Kommentare zu Zitaten
+// Comments on quotes
 final class Comment
 {
     private PDO $db;

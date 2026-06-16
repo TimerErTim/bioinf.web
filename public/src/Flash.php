@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-// Meldungen nach Redirect (einmal anzeigen, dann weg)
+// Messages after redirect (show once, then remove)
 final class Flash
 {
     private const SESSION_KEY = '_flash';

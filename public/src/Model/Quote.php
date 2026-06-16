@@ -6,7 +6,7 @@ namespace App\Model;
 
 use PDO;
 
-// Zitate aus der DB lesen und speichern
+// Read and save quotes from the database
 final class Quote
 {
     private PDO $db;

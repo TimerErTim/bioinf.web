@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// DB-Zugangsdaten für XAMPP (laut Projektangabe)
+// Database settings for XAMPP (from project brief)
 return [
     'app' => [
         'name' => 'GoT Quotes',

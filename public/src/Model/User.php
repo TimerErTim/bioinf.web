@@ -6,7 +6,7 @@ namespace App\Model;
 
 use PDO;
 
-// User in der DB
+// Users in the database
 final class User
 {
     private PDO $db;

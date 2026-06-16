@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-// Kurzschreibweise für htmlspecialchars (XSS-Schutz)
+// Short helper for htmlspecialchars (XSS protection)
 final class Html
 {
     public static function e(?string $value): string

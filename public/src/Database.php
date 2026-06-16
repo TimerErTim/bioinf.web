@@ -7,7 +7,7 @@ namespace App;
 use PDO;
 use PDOException;
 
-// PDO-Verbindung zur MySQL-DB
+// PDO connection to MySQL
 final class Database
 {
     private static ?PDO $connection = null;

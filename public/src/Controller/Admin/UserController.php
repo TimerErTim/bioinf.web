@@ -11,7 +11,7 @@ use App\Response;
 use App\Service\AuthService;
 use App\View;
 
-// Admin: User verwalten
+// Admin: manage users
 final class UserController
 {
     private User $users;

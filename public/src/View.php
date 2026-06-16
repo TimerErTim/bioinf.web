@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-// Views einbinden und Layout drumherum rendern
+// Load views and wrap them in the layout
 final class View
 {
     public static function render(string $view, array $data = [], ?string $layout = 'layouts/main'): void

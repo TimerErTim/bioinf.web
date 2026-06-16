@@ -8,7 +8,7 @@ use App\Flash;
 use App\Response;
 use App\View;
 
-// Login-Status über $_SESSION (wird in bootstrap.php mit session_start() gestartet)
+// Login state in $_SESSION (session_start() runs in bootstrap.php)
 final class AuthService
 {
     public static function login(int $userId, string $username, bool $isAdmin): void

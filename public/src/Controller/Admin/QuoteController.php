@@ -12,7 +12,7 @@ use App\Service\AuthService;
 use App\Service\ValidationService;
 use App\View;
 
-// Admin: Zitate anlegen, bearbeiten, löschen
+// Admin: create, edit and delete quotes
 final class QuoteController
 {
     private Quote $quotes;

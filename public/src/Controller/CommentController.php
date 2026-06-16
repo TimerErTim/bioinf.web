@@ -13,7 +13,7 @@ use App\Service\AuthService;
 use App\Service\ValidationService;
 use App\View;
 
-// Kommentare: anlegen, bearbeiten, löschen
+// Comments: create, edit, delete
 final class CommentController
 {
     private Quote $quotes;
