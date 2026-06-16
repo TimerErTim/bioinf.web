@@ -25,7 +25,7 @@ Die Anwendung erfüllt die Anforderungen der [Projektangabe](../WEB4_Projekt_Ang
 | Zitate (Quotes) | Werden in der Datenbank gespeichert und initial per SQL-Dump bereitgestellt. Nur Admins dürfen Zitate anlegen, bearbeiten und löschen. |
 | Kommentare (Comments) | **Haupt-CRUD-Ressource** für eingeloggte Nutzer (Create, Read, Update, Delete eigener Kommentare). |
 | Benutzer (Users) | Registrierung für anonyme Besucher; Admins verwalten Benutzer (Löschen, Admin-Rolle). |
-| Bilder | Optional pro Zitat; Dateien liegen statisch unter `public/assets/images/quotes/`. In der DB wird nur der relative Pfad gespeichert. |
+| Bilder | Optional pro Zitat; derzeit nicht im Einsatz. Dateien liegen statisch unter `public/assets/images/quotes/`. |
 | JavaScript | Erlaubt für UX (z. B. Bestätigungsdialoge), **nicht** für Validierung oder Sicherheitslogik. |
 | Externe Abhängigkeiten | Kein Composer/npm nötig; Copy auf Standard-XAMPP reicht. Bootstrap o. Ä. als eingebettete statische Dateien ist erlaubt. |
 | Authentifizierung | Session-basiert (PHP `$_SESSION`). |
@@ -272,7 +272,7 @@ public/
 ```
 
 Beziehungen:
-- `comments.user_id` → `users.id` (**ON DELETE CASCADE** oder RESTRICT — dokumentieren; empfohlen: CASCADE bei User-Löschung)
+- `comments.user_id` → `users.id` (**ON DELETE SET NULL** — gelöschte Autoren werden in der UI als `<deleted>` angezeigt)
 - `comments.quote_id` → `quotes.id` (**ON DELETE CASCADE**)
 
 ### 7.2 Tabellendefinitionen
@@ -305,7 +305,7 @@ Beziehungen:
 |---|---|---|
 | `id` | `INT UNSIGNED` | PK, AUTO_INCREMENT |
 | `quote_id` | `INT UNSIGNED` | NOT NULL, FK → `quotes.id` |
-| `user_id` | `INT UNSIGNED` | NOT NULL, FK → `users.id` |
+| `user_id` | `INT UNSIGNED` | NULL, FK → `users.id`, ON DELETE SET NULL |
 | `content` | `TEXT` | NOT NULL |
 | `created_at` | `DATETIME` | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
 | `updated_at` | `DATETIME` | NULL ON UPDATE CURRENT_TIMESTAMP |
@@ -549,12 +549,12 @@ Jeder Testfall in der Doku dokumentieren: **ID, Vorbereitung, Schritte, Erwartet
 
 | # | Frage | Vorschlag |
 |---|---|---|
-| 1 | Automatisches Login nach Registrierung? | Nein → Login-Seite mit Hinweis |
+| 1 | Automatisches Login nach Registrierung? | **Nein** — Redirect zur Login-Seite mit Erfolgsmeldung |
 | 2 | CSRF-Tokens? | Ja, einheitlich für POST |
 | 3 | Paginierung Zitate/Kommentare? | Ab 20 Einträgen |
 | 4 | Bild-Upload vs. statische Pfade für Admin? | Erst statische Pfade; Upload optional |
-| 5 | Löschverhalten bei User-Löschung | CASCADE auf Kommentare |
-| 6 | Teammitglieder-Namen für Doku | In `doc/main.typ` ergänzen |
+| 5 | Löschverhalten bei User-Löschung | **SET NULL** auf `comments.user_id`, UI zeigt `<deleted>` |
+| 6 | Teammitglieder | Nathalie Sonnleitner, Tim Peko |
 
 ---
 

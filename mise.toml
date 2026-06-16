@@ -6,6 +6,9 @@ typst = "0.14.2"
 team_nr = "4"
 
 [env]
+TYPST_ROOT = "{{config_root}}"
+TYPST_FONT_PATH = "{{config_root}}/doc/fonts"
+
 # Define repository-relative paths
 MYSQL_REPO_ROOT = "{{config_root}}"
 MYSQL_DATA_DIR = "{{config_root}}/data"
@@ -79,5 +82,6 @@ outputs = ["{{vars.zip_file}}"]
 run = [
     "rm -f {{vars.zip_file}}",
     "mise run package-into-zip {{vars.zip_file}} public/",
-    "mise run package-into-zip {{vars.zip_file}} -s doc/ WEB4_PHP_TEAM{{vars.team_nr}}.pdf"
+    "mise run package-into-zip {{vars.zip_file}} -s doc/ WEB4_PHP_TEAM{{vars.team_nr}}.pdf",
+    "mise run package-into-zip {{vars.zip_file}} -s sql/ WEB4_PHP_TEAM{{vars.team_nr}}.sql"
 ]

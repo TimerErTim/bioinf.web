@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Local development overrides (optional).
+ * Copy to config.local.php and adjust for mise MySQL on port 33060.
+ */
+return [
+    'db' => [
+        'port' => 33060,
+    ],
+];
