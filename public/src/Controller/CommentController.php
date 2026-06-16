@@ -13,9 +13,7 @@ use App\Service\AuthService;
 use App\Service\ValidationService;
 use App\View;
 
-/**
- * Comment CRUD for authenticated users.
- */
+// Kommentare: anlegen, bearbeiten, löschen
 final class CommentController
 {
     private Quote $quotes;
@@ -45,7 +43,7 @@ final class CommentController
 
         if ($errors !== []) {
             View::render('quotes/show', [
-                'title' => 'Quote by ' . $quote['speaker'],
+                'title' => 'Zitat von ' . $quote['speaker'],
                 'quote' => $quote,
                 'comments' => $this->comments->findByQuoteId($quoteId),
                 'commentErrors' => $errors,
@@ -54,9 +52,8 @@ final class CommentController
             return;
         }
 
-        $userId = AuthService::userId();
-        $this->comments->create($quoteId, $userId, $content);
-        Flash::success('Comment added.');
+        $this->comments->create($quoteId, AuthService::userId(), $content);
+        Flash::success('Kommentar gespeichert.');
         View::redirect('/quotes/' . $quoteId);
     }
 
@@ -66,7 +63,7 @@ final class CommentController
 
         $comment = $this->loadOwnedComment((int) $id);
         View::render('comments/edit', [
-            'title' => 'Edit Comment',
+            'title' => 'Kommentar bearbeiten',
             'comment' => $comment,
             'errors' => [],
         ]);
@@ -84,7 +81,7 @@ final class CommentController
 
         if ($errors !== []) {
             View::render('comments/edit', [
-                'title' => 'Edit Comment',
+                'title' => 'Kommentar bearbeiten',
                 'comment' => array_merge($comment, ['content' => $content]),
                 'errors' => $errors,
             ]);
@@ -92,7 +89,7 @@ final class CommentController
         }
 
         $this->comments->update((int) $comment['id'], $content);
-        Flash::success('Comment updated.');
+        Flash::success('Kommentar aktualisiert.');
         View::redirect('/quotes/' . $comment['quote_id']);
     }
 
@@ -116,11 +113,10 @@ final class CommentController
         }
 
         $this->comments->delete((int) $comment['id']);
-        Flash::success('Comment deleted.');
+        Flash::success('Kommentar gelöscht.');
         View::redirect('/quotes/' . $comment['quote_id']);
     }
 
-    /** @return array<string, mixed> */
     private function loadOwnedComment(int $commentId): array
     {
         $comment = $this->comments->findById($commentId);

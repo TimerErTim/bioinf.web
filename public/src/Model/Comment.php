@@ -6,16 +6,16 @@ namespace App\Model;
 
 use PDO;
 
-/**
- * Comment persistence and domain queries.
- */
+// Kommentare zu Zitaten
 final class Comment
 {
-    public function __construct(private readonly PDO $db)
+    private PDO $db;
+
+    public function __construct(PDO $db)
     {
+        $this->db = $db;
     }
 
-    /** @return list<array<string, mixed>> */
     public function findByQuoteId(int $quoteId): array
     {
         $stmt = $this->db->prepare(
@@ -72,14 +72,5 @@ final class Comment
         $stmt = $this->db->prepare('DELETE FROM comments WHERE id = :id');
 
         return $stmt->execute(['id' => $id]);
-    }
-
-    public function isAuthor(int $commentId, int $userId): bool
-    {
-        $comment = $this->findById($commentId);
-
-        return $comment !== null
-            && $comment['user_id'] !== null
-            && (int) $comment['user_id'] === $userId;
     }
 }

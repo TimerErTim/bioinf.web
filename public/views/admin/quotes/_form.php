@@ -30,12 +30,5 @@ $action = $isEdit
         <input type="number" id="episode" name="episode" class="form-control" min="1" max="255"
                value="<?= Html::e((string) ($quote['episode'] ?? '')) ?>">
     </div>
-    <div class="form-group">
-        <label for="image_path">Bild-Pfad (optional)</label>
-        <input type="text" id="image_path" name="image_path" class="form-control"
-               value="<?= Html::e($quote['image_path'] ?? '') ?>"
-               placeholder="assets/images/quotes/example.jpg">
-        <p class="form-hint">Relativer Pfad unter public/. Leer lassen wenn kein Bild.</p>
-    </div>
     <button type="submit" class="btn btn-primary"><?= $isEdit ? 'Speichern' : 'Anlegen' ?></button>
 </form>

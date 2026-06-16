@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-/**
- * Session-backed flash messages (one-time display).
- */
+// Meldungen nach Redirect (einmal anzeigen, dann weg)
 final class Flash
 {
     private const SESSION_KEY = '_flash';
@@ -28,7 +26,6 @@ final class Flash
         }
     }
 
-    /** @return list<array{type: string, message: string}> */
     public static function consume(): array
     {
         $messages = $_SESSION[self::SESSION_KEY] ?? [];

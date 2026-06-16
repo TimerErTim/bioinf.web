@@ -6,13 +6,14 @@ namespace App\Model;
 
 use PDO;
 
-/**
- * User persistence and domain queries.
- */
+// User in der DB
 final class User
 {
-    public function __construct(private readonly PDO $db)
+    private PDO $db;
+
+    public function __construct(PDO $db)
     {
+        $this->db = $db;
     }
 
     public function findById(int $id): ?array
@@ -33,7 +34,6 @@ final class User
         return $row ?: null;
     }
 
-    /** @return list<array<string, mixed>> */
     public function findAll(): array
     {
         $stmt = $this->db->query('SELECT id, username, is_admin, created_at FROM users ORDER BY created_at ASC');

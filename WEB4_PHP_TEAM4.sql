@@ -31,7 +31,6 @@ CREATE TABLE `quotes` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `text` TEXT NOT NULL,
   `speaker` VARCHAR(100) NOT NULL,
-  `image_path` VARCHAR(255) DEFAULT NULL,
   `season` TINYINT UNSIGNED DEFAULT NULL,
   `episode` TINYINT UNSIGNED DEFAULT NULL,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -63,19 +62,19 @@ INSERT INTO `users` (`id`, `username`, `password_hash`, `is_admin`, `created_at`
 (2, 'tyrion_fan', '$2y$10$2OBUC0AU2AH1VSVrI9UyvOfrvwdHKWqMLMbjv95V.0w7xvQxsjU0a', 0, '2026-02-01 12:00:00'),
 (3, 'arya_fan', '$2y$10$2OBUC0AU2AH1VSVrI9UyvOfrvwdHKWqMLMbjv95V.0w7xvQxsjU0a', 0, '2026-02-10 14:30:00');
 
-INSERT INTO `quotes` (`id`, `text`, `speaker`, `image_path`, `season`, `episode`) VALUES
-(1, 'When you play the game of thrones, you win or you die. There is no middle ground.', 'Cersei Lannister', NULL, 1, 7),
-(2, 'The night is dark and full of terrors.', 'Melisandre', NULL, 2, 1),
-(3, 'A Lannister always pays his debts.', 'Tyrion Lannister', NULL, 1, 5),
-(4, 'Winter is coming.', 'Eddard Stark', NULL, 1, 1),
-(5, 'Hold the door!', 'Hodor', NULL, 6, 5),
-(6, 'Any man who must say "I am the king" is no true king.', 'Tywin Lannister', NULL, 3, 10),
-(7, 'Chaos isn''t a pit. Chaos is a ladder.', 'Petyr Baelish', NULL, 3, 6),
-(8, 'The North remembers.', 'Lyanna Mormont', NULL, 7, 1),
-(9, 'What do we say to the God of Death? Not today.', 'Syrio Forel', NULL, 1, 8),
-(10, 'I drink and I know things.', 'Tyrion Lannister', NULL, 6, 2),
-(11, 'Never forget what you are. The rest of the world will not. Wear it like armor, and it can never be used to hurt you.', 'Tyrion Lannister', NULL, 1, 1),
-(12, 'Power is power.', 'Cersei Lannister', NULL, 2, 3);
+INSERT INTO `quotes` (`id`, `text`, `speaker`, `season`, `episode`) VALUES
+(1, 'When you play the game of thrones, you win or you die. There is no middle ground.', 'Cersei Lannister', 1, 7),
+(2, 'The night is dark and full of terrors.', 'Melisandre', 2, 1),
+(3, 'A Lannister always pays his debts.', 'Tyrion Lannister', 1, 5),
+(4, 'Winter is coming.', 'Eddard Stark', 1, 1),
+(5, 'Hold the door!', 'Hodor', 6, 5),
+(6, 'Any man who must say "I am the king" is no true king.', 'Tywin Lannister', 3, 10),
+(7, 'Chaos isn''t a pit. Chaos is a ladder.', 'Petyr Baelish', 3, 6),
+(8, 'The North remembers.', 'Lyanna Mormont', 7, 1),
+(9, 'What do we say to the God of Death? Not today.', 'Syrio Forel', 1, 8),
+(10, 'I drink and I know things.', 'Tyrion Lannister', 6, 2),
+(11, 'Never forget what you are. The rest of the world will not. Wear it like armor, and it can never be used to hurt you.', 'Tyrion Lannister', 1, 1),
+(12, 'Power is power.', 'Cersei Lannister', 2, 3);
 
 INSERT INTO `comments` (`quote_id`, `user_id`, `content`, `created_at`) VALUES
 (1, 2, 'One of the most iconic lines in the entire series!', '2026-03-01 09:15:00'),

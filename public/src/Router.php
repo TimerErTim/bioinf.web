@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace App;
 
-/**
- * Simple front controller router with parameter placeholders.
- */
+// URL → Controller-Methode
 final class Router
 {
-    /** @var list<array{method: string, pattern: string, handler: callable}> */
     private array $routes = [];
 
     public function get(string $pattern, callable $handler): void
@@ -42,7 +39,7 @@ final class Router
         }
 
         http_response_code(404);
-        View::render('errors/404', ['title' => 'Not Found']);
+        View::render('errors/404', ['title' => 'Nicht gefunden']);
     }
 
     private function add(string $method, string $pattern, callable $handler): void
@@ -54,9 +51,6 @@ final class Router
         ];
     }
 
-    /**
-     * @return array<string, string>|null
-     */
     private function match(string $pattern, string $path): ?array
     {
         $regex = preg_replace('#\{([a-zA-Z_]+)\}#', '(?P<$1>[^/]+)', $pattern);

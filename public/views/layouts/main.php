@@ -60,7 +60,7 @@ use App\Service\AuthService;
 
     <footer class="site-footer">
         <div class="container">
-            WEB4 PHP — Team 4 — Game of Thrones Quotes
+            WEB4 PHP — Game of Thrones Quotes
         </div>
     </footer>
 </body>

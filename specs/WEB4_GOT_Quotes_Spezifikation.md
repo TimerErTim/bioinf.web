@@ -25,7 +25,6 @@ Die Anwendung erfüllt die Anforderungen der [Projektangabe](../WEB4_Projekt_Ang
 | Zitate (Quotes) | Werden in der Datenbank gespeichert und initial per SQL-Dump bereitgestellt. Nur Admins dürfen Zitate anlegen, bearbeiten und löschen. |
 | Kommentare (Comments) | **Haupt-CRUD-Ressource** für eingeloggte Nutzer (Create, Read, Update, Delete eigener Kommentare). |
 | Benutzer (Users) | Registrierung für anonyme Besucher; Admins verwalten Benutzer (Löschen, Admin-Rolle). |
-| Bilder | Optional pro Zitat; derzeit nicht im Einsatz. Dateien liegen statisch unter `public/assets/images/quotes/`. |
 | JavaScript | Erlaubt für UX (z. B. Bestätigungsdialoge), **nicht** für Validierung oder Sicherheitslogik. |
 | Externe Abhängigkeiten | Kein Composer/npm nötig; Copy auf Standard-XAMPP reicht. Bootstrap o. Ä. als eingebettete statische Dateien ist erlaubt. |
 | Authentifizierung | Session-basiert (PHP `$_SESSION`). |
@@ -90,13 +89,13 @@ Die Anwendung erfüllt die Anforderungen der [Projektangabe](../WEB4_Projekt_Ang
 - Link zur Detailseite.
 
 #### Detail (`GET /quotes/{id}`)
-- Vollständiger Zitat-Text, Sprecher, optional Bild, Metadaten (z. B. Staffel/Episode falls vorhanden).
+- Vollständiger Zitat-Text, Sprecher, Metadaten (z. B. Staffel/Episode falls vorhanden).
 - Darunter: chronologische Kommentarliste (Autor, Zeitstempel, Inhalt).
 - Für eingeloggte Nutzer: Formular „Neuer Kommentar".
 - Bearbeiten/Löschen-Buttons nur bei berechtigten Kommentaren sichtbar.
 
 #### Admin: Zitat-Verwaltung (`GET/POST /admin/quotes`, CRUD)
-- **Create:** Formular für Text, Sprecher, optionales Bild (Upload oder Pfad-Auswahl aus vorhandenen Assets).
+- **Create:** Formular für Text, Sprecher, optional Staffel/Episode.
 - **Read:** Admin-Liste aller Zitate.
 - **Update:** Bearbeitungsformular.
 - **Delete:** Löschen mit Bestätigung; zugehörige Kommentare per `ON DELETE CASCADE` oder explizit mitlöschen.
@@ -163,10 +162,7 @@ public/
 ├── index.php                 # Front Controller, Bootstrap
 ├── .htaccess                 # URL-Rewriting → index.php
 ├── assets/
-│   ├── css/
-│   ├── js/
-│   └── images/
-│       └── quotes/           # GoT-Bilder (optional pro Zitat)
+│   └── css/
 ├── src/
 │   ├── bootstrap.php         # Autoload, Config, Session-Start
 │   ├── config.php            # DB-Credentials (aus Umgebung/XAMPP-Defaults)
@@ -238,18 +234,9 @@ public/
 
 ### 6.4 Konfiguration Datenbank
 
-**Entwicklung (mise):** Werte aus [`mise.toml`](../mise.toml):
+**XAMPP / Abgabe:** Standard laut Projektangabe — Port `3306`, DB-Name `team_4`, User `fh_webphp`, Passwort `fh_webphp`.
 
-| Variable | Wert |
-|---|---|
-| `MYSQL_TCP_PORT` | `33060` |
-| `MYSQL_USER` | `fh_webphp` |
-| `MYSQL_PASSWORD` | `fh_webphp` |
-| `MYSQL_DATABASE` | `team_4` |
-
-**Abgabe / XAMPP:** Standard laut Projektangabe — Port `3306`, gleiche Credentials, DB-Name `team_4`.
-
-`config.php` soll beide Umgebungen unterstützen (z. B. per erkennbarem Dev-Port oder Konstante am Dateianfang).
+`config.php` enthält diese Werte. Optional kann `config.local.php` den Port überschreiben.
 
 ---
 
@@ -264,7 +251,7 @@ public/
 │ id (PK)     │──┐    │ id (PK)     │    ┌──│ id (PK)     │
 │ username    │  └───<│ user_id(FK) │    │  │ text        │
 │ password    │       │ quote_id(FK)│>───┘  │ speaker     │
-│ is_admin    │       │ content     │       │ image_path  │
+│ is_admin    │       │ content     │       │ season      │
 │ created_at  │       │ created_at  │       │ season      │
 └─────────────┘       │ updated_at  │       │ episode     │
                       └─────────────┘       │ created_at  │
@@ -294,7 +281,6 @@ Beziehungen:
 | `id` | `INT UNSIGNED` | PK, AUTO_INCREMENT |
 | `text` | `TEXT` | NOT NULL |
 | `speaker` | `VARCHAR(100)` | NOT NULL |
-| `image_path` | `VARCHAR(255)` | NULL (relativ zu `public/`) |
 | `season` | `TINYINT UNSIGNED` | NULL |
 | `episode` | `TINYINT UNSIGNED` | NULL |
 | `created_at` | `DATETIME` | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
@@ -318,7 +304,6 @@ Beziehungen:
 - ≥ 2 reguläre Testbenutzer
 - ≥ 10 Zitate mit verschiedenen Sprechern
 - ≥ 15 Kommentare, verteilt auf mehrere Zitate und Benutzer
-- Mindestens 2 Zitate mit `image_path`
 
 ---
 
@@ -332,7 +317,6 @@ Beziehungen:
 | `password` (Registrierung) | min. 8 Zeichen; serverseitig prüfen |
 | `quote.text` | 1–2000 Zeichen; nicht leer |
 | `quote.speaker` | 1–100 Zeichen |
-| `quote.image_path` | optional; nur erlaubte Pfade/Extensions (`.jpg`, `.png`, `.webp`) |
 | `comment.content` | 1–1000 Zeichen; nicht leer nach `trim()` |
 
 ### 8.2 Fehlerdarstellung
@@ -379,7 +363,6 @@ Beziehungen:
 ┌────────────────────────────────────────────┐
 │  [Logo/Titel]              Nav: … Login …  │
 ├────────────────────────────────────────────┤
-│  [ optional: Bild ]                        │
 │  „Zitat-Text …"                            │
 │  — Sprecher (S01E03)                       │
 ├────────────────────────────────────────────┤
@@ -404,7 +387,7 @@ Beziehungen:
 ## 10. Dokumentation (Typst)
 
 Quelle: [`doc/main.typ`](../doc/main.typ)  
-Build: `mise run build:documentation` → `WEB4_PHP_TEAM4.pdf`
+Build: `typst compile --root . doc/main.typ WEB4_PHP_TEAM4.pdf`
 
 ### 10.1 Pflichtinhalte laut Projektangabe
 
@@ -491,16 +474,13 @@ Jeder Testfall in der Doku dokumentieren: **ID, Vorbereitung, Schritte, Erwartet
 
 ---
 
-## 12. Entwicklungsumgebung und Werkzeuge
+## 12. Entwicklungsumgebung
 
-| Aufgabe | Befehl / Ort |
+| Aufgabe | Ort |
 |---|---|
-| MySQL starten | `mise run run:db` |
-| Typst-Doku bauen | `mise run build:documentation` |
-| Abgabe-Paket erzeugen | `mise run package` |
-| Typst formatieren | `mise run fmt:typst` |
 | Apache Document Root | `public/` |
-| DB-Socket (Dev) | `data/mysql.sock` (Port `33060`) |
+| SQL-Dump | `WEB4_PHP_TEAM4.sql` |
+| Dokumentation | `doc/main.typ` → PDF |
 
 ---
 
@@ -552,9 +532,8 @@ Jeder Testfall in der Doku dokumentieren: **ID, Vorbereitung, Schritte, Erwartet
 | 1 | Automatisches Login nach Registrierung? | **Nein** — Redirect zur Login-Seite mit Erfolgsmeldung |
 | 2 | CSRF-Tokens? | Ja, einheitlich für POST |
 | 3 | Paginierung Zitate/Kommentare? | Ab 20 Einträgen |
-| 4 | Bild-Upload vs. statische Pfade für Admin? | Erst statische Pfade; Upload optional |
-| 5 | Löschverhalten bei User-Löschung | **SET NULL** auf `comments.user_id`, UI zeigt `<deleted>` |
-| 6 | Teammitglieder | Nathalie Sonnleitner, Tim Peko |
+| 4 | Teammitglieder | Nathalie Sonnleitner, Tim Peko |
+| 5 | Löschverhalten bei User-Löschung | SET NULL auf `comments.user_id`, UI zeigt `<deleted>` |
 
 ---
 
@@ -562,8 +541,6 @@ Jeder Testfall in der Doku dokumentieren: **ID, Vorbereitung, Schritte, Erwartet
 
 - [WEB4_Projekt_Angabe.md](../WEB4_Projekt_Angabe.md)
 - [doc/main.typ](../doc/main.typ) — Dokumentations-Einstieg
-- [mise.toml](../mise.toml) — DB-Konfiguration Entwicklung
-- [mise.toml → tasks.package](../mise.toml) — Abgabe-Automatisierung
 
 ---
 

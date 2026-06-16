@@ -12,9 +12,7 @@ use App\Service\AuthService;
 use App\Service\ValidationService;
 use App\View;
 
-/**
- * Admin quote management (full CRUD).
- */
+// Admin: Zitate anlegen, bearbeiten, löschen
 final class QuoteController
 {
     private Quote $quotes;
@@ -29,7 +27,7 @@ final class QuoteController
         AuthService::requireAdmin();
 
         View::render('admin/quotes/index', [
-            'title' => 'Manage Quotes',
+            'title' => 'Zitate verwalten',
             'quotes' => $this->quotes->findAll(),
         ]);
     }
@@ -44,7 +42,7 @@ final class QuoteController
         }
 
         View::render('admin/quotes/create', [
-            'title' => 'Add Quote',
+            'title' => 'Neues Zitat',
             'quote' => $this->emptyQuote(),
             'errors' => [],
         ]);
@@ -66,7 +64,7 @@ final class QuoteController
         }
 
         View::render('admin/quotes/edit', [
-            'title' => 'Edit Quote',
+            'title' => 'Zitat bearbeiten',
             'quote' => $quote,
             'errors' => [],
         ]);
@@ -84,7 +82,7 @@ final class QuoteController
         }
 
         $this->quotes->delete($quoteId);
-        Flash::success('Quote deleted.');
+        Flash::success('Zitat gelöscht.');
         View::redirect('/admin/quotes');
     }
 
@@ -96,7 +94,6 @@ final class QuoteController
         $data = [
             'text' => trim($_POST['text'] ?? ''),
             'speaker' => trim($_POST['speaker'] ?? ''),
-            'image_path' => trim($_POST['image_path'] ?? ''),
             'season' => trim($_POST['season'] ?? '') !== '' ? (int) $_POST['season'] : null,
             'episode' => trim($_POST['episode'] ?? '') !== '' ? (int) $_POST['episode'] : null,
         ];
@@ -104,13 +101,12 @@ final class QuoteController
         $errors = array_merge(
             ValidationService::quoteText($data['text']),
             ValidationService::speaker($data['speaker']),
-            ValidationService::imagePath($data['image_path'] ?: null),
-            ValidationService::optionalUint($_POST['season'] ?? null, 'Season'),
+            ValidationService::optionalUint($_POST['season'] ?? null, 'Staffel'),
             ValidationService::optionalUint($_POST['episode'] ?? null, 'Episode'),
         );
 
         $view = $quoteId === null ? 'admin/quotes/create' : 'admin/quotes/edit';
-        $title = $quoteId === null ? 'Add Quote' : 'Edit Quote';
+        $title = $quoteId === null ? 'Neues Zitat' : 'Zitat bearbeiten';
 
         if ($errors !== []) {
             View::render($view, [
@@ -123,22 +119,20 @@ final class QuoteController
 
         if ($quoteId === null) {
             $this->quotes->create($data);
-            Flash::success('Quote created.');
+            Flash::success('Zitat angelegt.');
         } else {
             $this->quotes->update($quoteId, $data);
-            Flash::success('Quote updated.');
+            Flash::success('Zitat gespeichert.');
         }
 
         View::redirect('/admin/quotes');
     }
 
-    /** @return array<string, mixed> */
     private function emptyQuote(): array
     {
         return [
             'text' => '',
             'speaker' => '',
-            'image_path' => '',
             'season' => '',
             'episode' => '',
         ];

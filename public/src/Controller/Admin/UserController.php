@@ -11,9 +11,7 @@ use App\Response;
 use App\Service\AuthService;
 use App\View;
 
-/**
- * Admin user management.
- */
+// Admin: User verwalten
 final class UserController
 {
     private User $users;
@@ -28,7 +26,7 @@ final class UserController
         AuthService::requireAdmin();
 
         View::render('admin/users/index', [
-            'title' => 'Manage Users',
+            'title' => 'Benutzerverwaltung',
             'users' => $this->users->findAll(),
             'currentUserId' => AuthService::userId(),
         ]);
@@ -48,18 +46,18 @@ final class UserController
         }
 
         if ($targetId === AuthService::userId()) {
-            Flash::error('You cannot change your own admin role.');
+            Flash::error('Eigene Admin-Rolle kannst du nicht ändern.');
             View::redirect('/admin/users');
         }
 
         $willDemote = (bool) $target['is_admin'];
         if ($willDemote && $this->users->countAdmins() <= 1) {
-            Flash::error('Cannot demote the last administrator.');
+            Flash::error('Letzter Admin — Rolle kann nicht entzogen werden.');
             View::redirect('/admin/users');
         }
 
         $this->users->setAdmin($targetId, !$willDemote);
-        Flash::success('User role updated.');
+        Flash::success('Rolle geändert.');
         View::redirect('/admin/users');
     }
 
@@ -77,12 +75,12 @@ final class UserController
         }
 
         if ((bool) $target['is_admin'] && $this->users->countAdmins() <= 1) {
-            Flash::error('Cannot delete the last administrator.');
+            Flash::error('Letzter Admin kann nicht gelöscht werden.');
             View::redirect('/admin/users');
         }
 
         $this->users->delete($targetId);
-        Flash::success('User deleted. Their comments now show as deleted.');
+        Flash::success('User gelöscht — Kommentare zeigen jetzt <deleted>.');
         View::redirect('/admin/users');
     }
 }

@@ -18,9 +18,6 @@ $isAdmin = AuthService::isAdmin();
 <p><a href="/">← Zurück zur Übersicht</a></p>
 
 <article class="card quote-detail">
-    <?php if (!empty($quote['image_path'])): ?>
-        <img src="/<?= Html::e($quote['image_path']) ?>" alt="Illustration" class="quote-image">
-    <?php endif; ?>
     <blockquote>„<?= Html::e($quote['text']) ?>"</blockquote>
     <p class="quote-meta">
         — <?= Html::e($quote['speaker']) ?>
@@ -66,9 +63,7 @@ $isAdmin = AuthService::isAdmin();
                                 <form method="post" action="/comments/<?= (int) $comment['id'] ?>/delete"
                                       onsubmit="return confirm('Kommentar wirklich löschen?');">
                                     <?= Csrf::field() ?>
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <?= $isAdmin && !$isOwner ? 'Admin löschen' : 'Löschen' ?>
-                                    </button>
+                                    <button type="submit" class="btn btn-danger btn-sm">Löschen</button>
                                 </form>
                             <?php endif; ?>
                         </div>

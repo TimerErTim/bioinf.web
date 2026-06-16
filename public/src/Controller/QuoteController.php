@@ -8,12 +8,9 @@ use App\Database;
 use App\Model\Comment;
 use App\Model\Quote;
 use App\Response;
-use App\Service\AuthService;
 use App\View;
 
-/**
- * Public quote listing and detail pages.
- */
+// Zitat-Liste und Detailseite (öffentlich)
 final class QuoteController
 {
     private const PAGE_SIZE = 20;
@@ -37,7 +34,7 @@ final class QuoteController
         $offset = ($page - 1) * self::PAGE_SIZE;
 
         View::render('quotes/index', [
-            'title' => 'Game of Thrones Quotes',
+            'title' => 'Game of Thrones Zitate',
             'quotes' => $this->quotes->findAll(self::PAGE_SIZE, $offset),
             'page' => $page,
             'totalPages' => $totalPages,
@@ -55,7 +52,7 @@ final class QuoteController
         }
 
         View::render('quotes/show', [
-            'title' => 'Quote by ' . $quote['speaker'],
+            'title' => 'Zitat von ' . $quote['speaker'],
             'quote' => $quote,
             'comments' => $this->comments->findByQuoteId($quoteId),
             'commentErrors' => [],

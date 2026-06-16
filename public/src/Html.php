@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-/**
- * HTML escaping helper for XSS prevention.
- */
+// Kurzschreibweise für htmlspecialchars (XSS-Schutz)
 final class Html
 {
     public static function e(?string $value): string

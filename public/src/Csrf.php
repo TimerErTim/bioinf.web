@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-/**
- * CSRF token generation and validation for POST requests.
- */
+// CSRF-Token für POST-Formulare
 final class Csrf
 {
     private const SESSION_KEY = '_csrf_token';

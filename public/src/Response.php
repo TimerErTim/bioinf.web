@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace App;
 
-/**
- * HTTP response helpers.
- */
+// HTTP-Hilfsfunktionen (403, 404, POST/CSRF prüfen)
 final class Response
 {
-    public static function forbidden(): never
+    public static function forbidden(): void
     {
         http_response_code(403);
-        View::render('errors/403', ['title' => 'Forbidden']);
+        View::render('errors/403', ['title' => 'Kein Zugriff']);
         exit;
     }
 
-    public static function notFound(): never
+    public static function notFound(): void
     {
         http_response_code(404);
-        View::render('errors/404', ['title' => 'Not Found']);
+        View::render('errors/404', ['title' => 'Nicht gefunden']);
         exit;
     }
 
@@ -34,7 +32,7 @@ final class Response
     public static function requireCsrf(): void
     {
         if (!Csrf::validate($_POST['_csrf'] ?? null)) {
-            Flash::error('Invalid security token. Please try again.');
+            Flash::error('Sicherheits-Token ungültig — bitte nochmal versuchen.');
             View::redirect('/');
         }
     }

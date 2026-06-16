@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-/**
- * View renderer with layout support.
- */
+// Views einbinden und Layout drumherum rendern
 final class View
 {
     public static function render(string $view, array $data = [], ?string $layout = 'layouts/main'): void
@@ -32,7 +30,7 @@ final class View
         return (string) ob_get_clean();
     }
 
-    public static function redirect(string $path): never
+    public static function redirect(string $path): void
     {
         header('Location: ' . $path);
         exit;

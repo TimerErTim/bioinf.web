@@ -27,9 +27,7 @@
 
 Diese Dokumentation beschreibt die Webanwendung *GoT Quotes* — eine PHP-Anwendung im MVC-Pattern, die berühmte Game-of-Thrones-Zitate präsentiert und es eingeloggten Nutzern ermöglicht, Kommentare zu verfassen, zu bearbeiten und zu löschen. Administratoren verwalten Benutzer und Zitate.
 
-*Start-URL (XAMPP):* `http://localhost/public/` — Document Root muss auf das Verzeichnis `public/` zeigen.
-
-*Start-URL (Entwicklung mit mise):* Apache auf `public/` mit MySQL Port `33060` (siehe `mise.toml`).
+*Start-URL (XAMPP):* `http://localhost/` — Document Root muss auf das Verzeichnis `public/` zeigen.
 
 = Projektmitglieder
 
@@ -77,7 +75,7 @@ digraph ER {
   node [shape=record, fontname="Roboto"];
 
   users [label="{users|id (PK)\lusername (UNIQUE)\lpassword_hash\lis_admin\lcreated_at\l}"];
-  quotes [label="{quotes|id (PK)\ltext\lspeaker\limage_path\lseason\lepisode\lcreated_at\l}"];
+  quotes [label="{quotes|id (PK)\ltext\lspeaker\lseason\lepisode\lcreated_at\l}"];
   comments [label="{comments|id (PK)\lquote_id (FK)\luser_id (FK, NULL)\lcontent\lcreated_at\lupdated_at\l}"];
 
   users -> comments [label="1 : N\nON DELETE SET NULL"];
@@ -107,7 +105,6 @@ digraph ER {
   [id], [INT UNSIGNED], [PK, AUTO_INCREMENT],
   [text], [TEXT], [NOT NULL],
   [speaker], [VARCHAR(100)], [NOT NULL],
-  [image_path], [VARCHAR(255)], [NULL — optional, derzeit ungenutzt],
   [season / episode], [TINYINT UNSIGNED], [NULL — optional],
   [created_at], [DATETIME], [DEFAULT CURRENT_TIMESTAMP],
 )
@@ -131,7 +128,29 @@ SQL-Dump: `sql/WEB4_PHP_TEAM4.sql`
 
 - Admin: `admin` / `admin`
 - Testuser: `tyrion_fan`, `arya_fan` — Passwort: `password123`
-- 12 Zitate, 15 Kommentare (ohne Bilder)
+- 12 Zitate, 15 Kommentare
+
+= Session und Login
+
+Nach dem Login speichern wir den eingeloggten User in der *PHP-Session*. Dafür braucht man zwei Dinge:
+
++ `session_start()` in `bootstrap.php` — startet die Session und macht `$_SESSION` verfügbar
++ Werte in `$_SESSION` schreiben/lesen — z.B. `$_SESSION['user_id']`, `$_SESSION['username']`, `$_SESSION['is_admin']`
+
+`AuthService` kapselt das: beim Login setzen wir die Session-Werte, beim Logout werden sie gelöscht. Auf jeder geschützten Seite prüfen wir mit `AuthService::check()` bzw. `requireLogin()`, ob jemand eingeloggt ist.
+
+Flash-Messages (Erfolg/Fehler nach Redirect) liegen ebenfalls in `$_SESSION` unter `_flash` und werden nach dem Anzeigen entfernt.
+
+== Verwendete PHP-Konzepte
+
+Im Projekt kommen vor allem folgende Themen aus der Übung zum Einsatz:
+
+- *PDO* — Datenbankzugriff mit Prepared Statements (`prepare`, `execute`, Platzhalter `:name`)
+- *Sessions* — Login-Status in `$_SESSION` (siehe oben)
+- *password\_hash / password\_verify* — Passwörter sicher speichern
+- *htmlspecialchars* — User-Input beim Ausgeben escapen (XSS)
+- *include/require* — Views und Config einbinden
+- *GET/POST* — Formulare und `$_POST`, Links und `$_GET`
 
 = Architektur
 
@@ -279,7 +298,6 @@ Alle Tests wurden manuell in Google Chrome unter XAMPP durchgeführt.
 == Voraussetzungen
 
 - XAMPP (Apache + PHP 8.x + MySQL/MariaDB)
-- Optional: mise für lokale Entwicklung
 
 == Schritte
 
@@ -289,12 +307,4 @@ Alle Tests wurden manuell in Google Chrome unter XAMPP durchgeführt.
 + Anwendung unter `http://localhost/` aufrufen
 + Mit `admin` / `admin` einloggen
 
-== Entwicklung mit mise
-
-```bash
-mise run run:db          # MySQL starten (Port 33060)
-mise run build:documentation
-mise run package         # Abgabe-ZIP erzeugen
-```
-
-Datenbank-Credentials: siehe `mise.toml` — DB `team_4`, User `fh_webphp`.
+Datenbank laut Projektangabe: `team_4`, User `fh_webphp`, Passwort `fh_webphp`, Port `3306`.

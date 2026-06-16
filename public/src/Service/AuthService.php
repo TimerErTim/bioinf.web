@@ -4,60 +4,52 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-/**
- * Session-based authentication state.
- */
+use App\Flash;
+use App\Response;
+use App\View;
+
+// Login-Status über $_SESSION (wird in bootstrap.php mit session_start() gestartet)
 final class AuthService
 {
-    private const SESSION_USER_ID = 'user_id';
-    private const SESSION_USERNAME = 'username';
-    private const SESSION_IS_ADMIN = 'is_admin';
-
     public static function login(int $userId, string $username, bool $isAdmin): void
     {
         session_regenerate_id(true);
-        $_SESSION[self::SESSION_USER_ID] = $userId;
-        $_SESSION[self::SESSION_USERNAME] = $username;
-        $_SESSION[self::SESSION_IS_ADMIN] = $isAdmin;
+        $_SESSION['user_id'] = $userId;
+        $_SESSION['username'] = $username;
+        $_SESSION['is_admin'] = $isAdmin;
     }
 
     public static function logout(): void
     {
-        unset(
-            $_SESSION[self::SESSION_USER_ID],
-            $_SESSION[self::SESSION_USERNAME],
-            $_SESSION[self::SESSION_IS_ADMIN],
-        );
+        unset($_SESSION['user_id'], $_SESSION['username'], $_SESSION['is_admin']);
         session_regenerate_id(true);
     }
 
     public static function check(): bool
     {
-        return isset($_SESSION[self::SESSION_USER_ID]);
+        return isset($_SESSION['user_id']);
     }
 
     public static function userId(): ?int
     {
-        return isset($_SESSION[self::SESSION_USER_ID])
-            ? (int) $_SESSION[self::SESSION_USER_ID]
-            : null;
+        return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
     }
 
     public static function username(): ?string
     {
-        return $_SESSION[self::SESSION_USERNAME] ?? null;
+        return $_SESSION['username'] ?? null;
     }
 
     public static function isAdmin(): bool
     {
-        return !empty($_SESSION[self::SESSION_IS_ADMIN]);
+        return !empty($_SESSION['is_admin']);
     }
 
     public static function requireLogin(): void
     {
         if (!self::check()) {
-            \App\Flash::error('Please log in to continue.');
-            \App\View::redirect('/login');
+            Flash::error('Bitte einloggen.');
+            View::redirect('/login');
         }
     }
 
@@ -65,7 +57,7 @@ final class AuthService
     {
         self::requireLogin();
         if (!self::isAdmin()) {
-            \App\Response::forbidden();
+            Response::forbidden();
         }
     }
 }

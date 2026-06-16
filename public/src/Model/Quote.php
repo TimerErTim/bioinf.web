@@ -6,16 +6,16 @@ namespace App\Model;
 
 use PDO;
 
-/**
- * Quote persistence and domain queries.
- */
+// Zitate aus der DB lesen und speichern
 final class Quote
 {
-    public function __construct(private readonly PDO $db)
+    private PDO $db;
+
+    public function __construct(PDO $db)
     {
+        $this->db = $db;
     }
 
-    /** @return list<array<string, mixed>> */
     public function findAll(int $limit = 100, int $offset = 0): array
     {
         $stmt = $this->db->prepare(
@@ -50,13 +50,12 @@ final class Quote
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO quotes (text, speaker, image_path, season, episode)
-             VALUES (:text, :speaker, :image_path, :season, :episode)',
+            'INSERT INTO quotes (text, speaker, season, episode)
+             VALUES (:text, :speaker, :season, :episode)',
         );
         $stmt->execute([
             'text' => $data['text'],
             'speaker' => $data['speaker'],
-            'image_path' => $data['image_path'] ?: null,
             'season' => $data['season'] ?: null,
             'episode' => $data['episode'] ?: null,
         ]);
@@ -68,8 +67,7 @@ final class Quote
     {
         $stmt = $this->db->prepare(
             'UPDATE quotes
-             SET text = :text, speaker = :speaker, image_path = :image_path,
-                 season = :season, episode = :episode
+             SET text = :text, speaker = :speaker, season = :season, episode = :episode
              WHERE id = :id',
         );
 
@@ -77,7 +75,6 @@ final class Quote
             'id' => $id,
             'text' => $data['text'],
             'speaker' => $data['speaker'],
-            'image_path' => $data['image_path'] ?: null,
             'season' => $data['season'] ?: null,
             'episode' => $data['episode'] ?: null,
         ]);

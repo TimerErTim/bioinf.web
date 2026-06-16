@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-/**
- * Application bootstrap: autoloading, session, configuration.
- */
-
+// Start: Config laden, Klassen automatisch einbinden, Session starten
 $config = require __DIR__ . '/config.php';
 
 $localConfig = __DIR__ . '/config.local.php';

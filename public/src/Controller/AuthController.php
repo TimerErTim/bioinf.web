@@ -12,9 +12,7 @@ use App\Service\AuthService;
 use App\Service\ValidationService;
 use App\View;
 
-/**
- * Authentication: registration, login, logout.
- */
+// Registrierung, Login, Logout
 final class AuthController
 {
     private User $users;
@@ -31,7 +29,7 @@ final class AuthController
         }
 
         View::render('auth/register', [
-            'title' => 'Register',
+            'title' => 'Registrierung',
             'username' => '',
             'errors' => [],
         ]);
@@ -54,16 +52,16 @@ final class AuthController
         $errors = array_merge($errors, ValidationService::password($password));
 
         if ($password !== $passwordConfirm) {
-            $errors[] = 'Passwords do not match.';
+            $errors[] = 'Passwörter stimmen nicht überein.';
         }
 
         if ($errors === [] && $this->users->findByUsername($username) !== null) {
-            $errors[] = 'This username is already taken.';
+            $errors[] = 'Benutzername ist schon vergeben.';
         }
 
         if ($errors !== []) {
             View::render('auth/register', [
-                'title' => 'Register',
+                'title' => 'Registrierung',
                 'username' => $username,
                 'errors' => $errors,
             ]);
@@ -71,7 +69,7 @@ final class AuthController
         }
 
         $this->users->create($username, password_hash($password, PASSWORD_DEFAULT));
-        Flash::success('Registration successful. Please log in.');
+        Flash::success('Registrierung ok — bitte einloggen.');
         View::redirect('/login');
     }
 
@@ -101,13 +99,13 @@ final class AuthController
             View::render('auth/login', [
                 'title' => 'Login',
                 'username' => $username,
-                'errors' => ['Invalid username or password.'],
+                'errors' => ['Benutzername oder Passwort ungültig.'],
             ]);
             return;
         }
 
         AuthService::login((int) $user['id'], $user['username'], (bool) $user['is_admin']);
-        Flash::success('Welcome back, ' . $user['username'] . '!');
+        Flash::success('Willkommen, ' . $user['username'] . '!');
         View::redirect('/');
     }
 
@@ -116,7 +114,7 @@ final class AuthController
         Response::requirePost();
         Response::requireCsrf();
         AuthService::logout();
-        Flash::success('You have been logged out.');
+        Flash::success('Ausgeloggt.');
         View::redirect('/');
     }
 }
