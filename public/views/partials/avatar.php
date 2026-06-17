@@ -21,21 +21,25 @@ if (!function_exists('renderAvatar')) {
             'lg' => 'h-16 w-16 text-xl',
         ];
         $cls = $sizes[$size] ?? $sizes['md'];
+        $ringCls = 'rounded-full ring-2 ring-stone-700 shrink-0 transition-shadow';
+        if ($asLink) {
+            $ringCls .= ' group-hover:ring-amber-500/70';
+        }
 
         ob_start();
         $path = $user['avatar_path'] ?? null;
         if (is_string($path) && $path !== '') {
-            echo '<img src="' . Html::e($path) . '" alt="" class="' . $cls . ' rounded-full object-cover ring-2 ring-stone-700 shrink-0">';
+            echo '<img src="' . Html::e($path) . '" alt="" class="' . $cls . ' ' . $ringCls . ' object-cover">';
         } else {
             $name = $user['username'] ?? '?';
             $initial = strtoupper(mb_substr((string) $name, 0, 1));
-            echo '<span class="' . $cls . ' inline-flex items-center justify-center rounded-full bg-gradient-to-br from-amber-700 to-stone-700 font-semibold text-stone-100 ring-2 ring-stone-700 shrink-0">' . Html::e($initial) . '</span>';
+            echo '<span class="' . $cls . ' ' . $ringCls . ' inline-flex items-center justify-center bg-gradient-to-br from-amber-700 to-stone-700 font-semibold text-stone-100">' . Html::e($initial) . '</span>';
         }
         $inner = ob_get_clean();
 
         $profileUrl = $asLink ? userProfileUrl(isset($user['user_id']) ? (int) $user['user_id'] : null) : null;
         if ($profileUrl !== null) {
-            echo '<a href="' . Html::e($profileUrl) . '" class="shrink-0 rounded-full hover:ring-2 hover:ring-amber-500/40 transition-all">' . $inner . '</a>';
+            echo '<a href="' . Html::e($profileUrl) . '" class="group inline-flex shrink-0 rounded-full">' . $inner . '</a>';
             return;
         }
 
