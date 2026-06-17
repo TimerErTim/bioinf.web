@@ -4,25 +4,18 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-/*
- * Server-side image upload handling for quotes and avatars.
- * Validates MIME type via finfo, enforces size limit, stores with random filename.
- */
 final class UploadService
 {
-    private const MAX_BYTES = 2_097_152; // 2 MB
+    private const MAX_BYTES = 2_097_152;
 
-    /** @var list<string> */
+    /** @var array<string, string> */
     private const ALLOWED_MIMES = [
         'image/jpeg' => 'jpg',
         'image/png' => 'png',
         'image/webp' => 'webp',
     ];
 
-    /**
-     * @param array<string, mixed> $file  One entry from $_FILES
-     * @return array{path: string|null, errors: list<string>}
-     */
+    /** @param array<string, mixed> $file */
     public static function storeImage(array $file, string $subdir): array
     {
         if (!isset($file['error']) || (int) $file['error'] === UPLOAD_ERR_NO_FILE) {
@@ -47,18 +40,16 @@ final class UploadService
             return ['path' => null, 'errors' => ['Nur JPEG, PNG oder WebP erlaubt.']];
         }
 
-        $ext = self::ALLOWED_MIMES[$mime];
-        $filename = bin2hex(random_bytes(16)) . '.' . $ext;
+        $filename = bin2hex(random_bytes(16)) . '.' . self::ALLOWED_MIMES[$mime];
         $relativePath = '/uploads/' . trim($subdir, '/') . '/' . $filename;
-
         $publicRoot = dirname(__DIR__, 2);
         $targetDir = $publicRoot . '/uploads/' . trim($subdir, '/');
+
         if (!is_dir($targetDir) && !mkdir($targetDir, 0755, true)) {
             return ['path' => null, 'errors' => ['Upload-Verzeichnis nicht beschreibbar.']];
         }
 
-        $targetPath = $targetDir . '/' . $filename;
-        if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+        if (!move_uploaded_file($file['tmp_name'], $targetDir . '/' . $filename)) {
             return ['path' => null, 'errors' => ['Datei konnte nicht gespeichert werden.']];
         }
 
@@ -67,16 +58,11 @@ final class UploadService
 
     public static function deleteFile(?string $relativePath): void
     {
-        if ($relativePath === null || $relativePath === '') {
+        if ($relativePath === null || $relativePath === '' || !str_starts_with($relativePath, '/uploads/')) {
             return;
         }
 
-        if (!str_starts_with($relativePath, '/uploads/')) {
-            return;
-        }
-
-        $publicRoot = dirname(__DIR__, 2);
-        $fullPath = $publicRoot . $relativePath;
+        $fullPath = dirname(__DIR__, 2) . $relativePath;
         if (is_file($fullPath)) {
             unlink($fullPath);
         }

@@ -72,12 +72,12 @@ final class CommentController
         $vote = (int) ($_POST['vote'] ?? 0);
         if ($vote !== 1 && $vote !== -1) {
             Flash::error('Ungültige Bewertung.');
-            $this->redirectBack('/quotes/' . $comment['quote_id']);
+            Response::redirectBack('/quotes/' . $comment['quote_id']);
         }
 
         $this->votes->setVote(AuthService::userId(), $commentId, $vote);
         Flash::success('Stimme gespeichert.');
-        $this->redirectBack('/quotes/' . $comment['quote_id']);
+        Response::redirectBack('/quotes/' . $comment['quote_id']);
     }
 
     public function removeVote(string $id): void
@@ -94,7 +94,7 @@ final class CommentController
 
         $this->votes->removeVote(AuthService::userId(), $commentId);
         Flash::success('Stimme entfernt.');
-        $this->redirectBack('/quotes/' . $comment['quote_id']);
+        Response::redirectBack('/quotes/' . $comment['quote_id']);
     }
 
     public function edit(string $id): void
@@ -111,7 +111,7 @@ final class CommentController
 
     public function update(string $id): void
     {
-        Response::requireMethod(['PUT', 'POST']);
+        Response::requireMethod(['PUT']);
         Response::requireCsrf();
         AuthService::requireLogin();
 
@@ -200,16 +200,5 @@ final class CommentController
         }
 
         return $comment;
-    }
-
-    private function redirectBack(string $fallback): void
-    {
-        $referer = $_SERVER['HTTP_REFERER'] ?? '';
-        if (is_string($referer) && $referer !== '' && str_contains($referer, $_SERVER['HTTP_HOST'] ?? '')) {
-            header('Location: ' . $referer);
-            exit;
-        }
-
-        View::redirect($fallback);
     }
 }

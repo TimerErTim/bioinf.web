@@ -44,7 +44,6 @@ $router->post('/comments/{id}/votes', fn (string $id) => $comments->setVote($id)
 $router->delete('/comments/{id}/votes', fn (string $id) => $comments->removeVote($id));
 $router->get('/comments/{id}/edit', fn (string $id) => $comments->edit($id));
 $router->put('/comments/{id}', fn (string $id) => $comments->update($id));
-$router->post('/comments/{id}', fn (string $id) => $comments->update($id));
 $router->delete('/comments/{id}', fn (string $id) => $comments->destroy($id));
 
 $router->get('/admin/users', fn () => $adminUsers->index());

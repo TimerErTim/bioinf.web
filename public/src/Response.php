@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace App;
 
-/*
- * Small HTTP helpers used by controllers before doing work.
- *
- * REST: DELETE/PATCH/PUT use Fetch from the browser; CSRF via header or form field.
- */
 final class Response
 {
     public static function forbidden(): void
@@ -47,15 +42,24 @@ final class Response
 
     public static function requireCsrf(): void
     {
-        $token = $_POST['_csrf'] ?? null;
-
-        if ($token === null) {
-            $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
-        }
+        $token = $_POST['_csrf'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
 
         if (!Csrf::validate(is_string($token) ? $token : null)) {
             Flash::error('Sicherheits-Token ungültig. Bitte nochmal versuchen.');
             View::redirect('/');
         }
+    }
+
+    public static function redirectBack(string $fallback): void
+    {
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+
+        if (is_string($referer) && $referer !== '' && $host !== '' && str_contains($referer, $host)) {
+            header('Location: ' . $referer);
+            exit;
+        }
+
+        View::redirect($fallback);
     }
 }

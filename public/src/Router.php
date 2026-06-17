@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace App;
 
-/*
- * Maps HTTP method + URL path to a handler function.
- *
- * Example: GET /quotes/5 matches pattern /quotes/{id} and calls the handler
- * with $id = "5".
- */
 final class Router
 {
     /** @var list<array{method: string, pattern: string, handler: callable}> */
@@ -42,7 +36,6 @@ final class Router
 
     public function dispatch(string $method, string $uri): void
     {
-        // Strip query string (?page=2) and normalize trailing slash.
         $path = parse_url($uri, PHP_URL_PATH) ?: '/';
         $path = rtrim($path, '/') ?: '/';
 
@@ -56,7 +49,6 @@ final class Router
                 continue;
             }
 
-            // ... spreads array values as function arguments: handler($id, ...)
             ($route['handler'])(...array_values($params));
             return;
         }
@@ -74,14 +66,9 @@ final class Router
         ];
     }
 
-    /**
-     * Turn /quotes/{id} into a regex and extract {id} from the path.
-     *
-     * @return array<string, string>|null  null if URL does not match
-     */
+    /** @return array<string, string>|null */
     private function match(string $pattern, string $path): ?array
     {
-        // {id} becomes a named capture group (?P<id>[^/]+)
         $regex = preg_replace('#\{([a-zA-Z_]+)\}#', '(?P<$1>[^/]+)', $pattern);
         $regex = '#^' . $regex . '$#';
 

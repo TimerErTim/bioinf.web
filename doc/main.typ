@@ -46,7 +46,8 @@ Die Anwendung erfüllt die Pflichtanforderungen der Projektangabe:
 - Serverseitige Validierung, SQL-Injection- und XSS-Schutz
 - Valides HTML5, Tailwind CSS 4 (CDN), JavaScript nur für REST-DELETE/PATCH (Fetch)
 - REST-konforme HTTP-Methoden (GET/POST/PUT/PATCH/DELETE)
-- Thread-Kommentare, Bild-Uploads (Zitate/Avatare)
+- Thread-Kommentare, Bild-Uploads (Zitate/Avatare), Likes und Votes
+- Feed-Sortierung (neu/top/trending), öffentliche Nutzerprofile
 
 == Rollenmodell
 
@@ -95,9 +96,24 @@ erDiagram
     datetime created_at
     datetime updated_at
   }
+  quote_likes {
+    int user_id FK
+    int quote_id FK
+    datetime created_at
+  }
+  comment_votes {
+    int id PK
+    int comment_id FK
+    int user_id FK "NULL, ON DELETE SET NULL"
+    int vote "1 or -1"
+    datetime created_at
+  }
   users ||--o{ comments : "writes"
+  users ||--o{ quote_likes : "likes"
+  quotes ||--o{ quote_likes : "liked by"
   quotes ||--o{ comments : "has CASCADE"
   comments ||--o{ comments : "replies CASCADE"
+  comments ||--o{ comment_votes : "votes CASCADE"
 ```
 
 == Tabellen
@@ -142,35 +158,43 @@ erDiagram
   [updated_at], [DATETIME], [NULL ON UPDATE],
 )
 
+=== quote_likes
+
+#table(
+  columns: (1fr, 1fr, 2fr),
+  table.header[*Spalte*][*Typ*][*Constraints*],
+  [user_id], [INT UNSIGNED], [FK → users.id, ON DELETE CASCADE],
+  [quote_id], [INT UNSIGNED], [FK → quotes.id, ON DELETE CASCADE],
+  [created_at], [DATETIME], [DEFAULT CURRENT_TIMESTAMP],
+)
+
+Primärschlüssel: `(user_id, quote_id)` — ein Like pro Nutzer und Zitat.
+
+=== comment_votes
+
+#table(
+  columns: (1fr, 1fr, 2fr),
+  table.header[*Spalte*][*Typ*][*Constraints*],
+  [id], [INT UNSIGNED], [PK, AUTO_INCREMENT],
+  [comment_id], [INT UNSIGNED], [FK → comments.id, ON DELETE CASCADE],
+  [user_id], [INT UNSIGNED], [FK → users.id, NULL, ON DELETE SET NULL],
+  [vote], [TINYINT], [NOT NULL, Werte 1 oder -1],
+  [created_at], [DATETIME], [DEFAULT CURRENT_TIMESTAMP],
+)
+
 == Testdaten
 
-SQL-Dump: `sql/WEB4_PHP_TEAM4.sql`
+SQL-Dump: `WEB4_PHP_TEAM7.sql`
 
 - Admin: `admin` / `admin`
 - Testuser: `tyrion_fan`, `arya_fan` (Passwort: `password123`)
-- 12 Zitate, 17 Kommentare (inkl. verschachtelter Antworten)
+- 12 Zitate, 17 Kommentare (inkl. verschachtelter Antworten), Likes und Votes
 
 = Session und Login
 
-Nach dem Login speichern wir den eingeloggten User in der *PHP-Session*. Dafür braucht man zwei Dinge:
+Login-Status liegt in der PHP-Session (`$_SESSION`: `user_id`, `username`, `is_admin`, `avatar_path`). `AuthService` kapselt Login, Logout und Berechtigungsprüfungen. Flash-Messages werden nach Redirect einmalig angezeigt.
 
-+ `session_start()` in `bootstrap.php` startet die Session und macht `$_SESSION` verfügbar
-+ Werte in `$_SESSION` schreiben/lesen, z.B. `$_SESSION['user_id']`, `$_SESSION['username']`, `$_SESSION['is_admin']`
-
-`AuthService` kapselt das: beim Login setzen wir die Session-Werte, beim Logout werden sie gelöscht. Auf jeder geschützten Seite prüfen wir mit `AuthService::check()` bzw. `requireLogin()`, ob jemand eingeloggt ist.
-
-Flash-Messages (Erfolg/Fehler nach Redirect) liegen ebenfalls in `$_SESSION` unter `_flash` und werden nach dem Anzeigen entfernt.
-
-== Verwendete PHP-Konzepte
-
-Im Projekt kommen vor allem folgende Themen aus der Übung zum Einsatz:
-
-- *PDO*: Datenbankzugriff mit Prepared Statements (`prepare`, `execute`, Platzhalter `:name`)
-- *Sessions*: Login-Status in `$_SESSION` (siehe oben)
-- *password\_hash / password\_verify*: Passwörter sicher speichern
-- *htmlspecialchars*: User-Input beim Ausgeben escapen (XSS)
-- *include/require*: Views und Config einbinden
-- *GET/POST*: Formulare und `$_POST`, Links und `$_GET`
+Verwendete PHP-Konzepte: PDO mit Prepared Statements, Sessions, `password_hash`/`password_verify`, `htmlspecialchars`, MVC mit `include`/`require`.
 
 = Architektur
 
@@ -205,24 +229,27 @@ public/
 │   ├── config.php
 │   ├── Router.php         # GET, POST, PUT, PATCH, DELETE
 │   ├── Controller/        # Auth, Profile, Quote, Comment, Admin/*
-│   ├── Model/             # User, Quote, Comment
+│   ├── Model/             # User, Quote, Comment, QuoteLike, CommentVote
 │   └── Service/           # AuthService, ValidationService, UploadService
-└── views/                 # PHP HTML-Templates (Tailwind CDN)
+└── views/                 # PHP-Templates (Tailwind CDN)
 ```
 
 == Request-Flow (Beispiel: Kommentar löschen)
 
 1. `DELETE /comments/{id}` → Router (Fetch aus `app.js`)
-2. `CommentController::destroy`: CSRF via `X-CSRF-Token`, Login, Berechtigung
-3. `Comment::delete`: Prepared Statement; CASCADE löscht Antworten
-4. Redirect zur Zitat-Detailseite mit Flash-Message
+2. `CommentController::destroy`: CSRF, Login, Berechtigung
+3. `Comment::delete` mit CASCADE auf Antworten
+4. Redirect zur Zitat-Detailseite
 
 == REST-Routing (Auszug)
 
 #table(
   columns: (1fr, 2fr, 2fr),
   table.header[*Methode*][*Pfad*][*Aktion*],
-  [GET], [/], [Zitate-Feed],
+  [GET], [/], [Zitate-Feed (`?sort=new|top|trending`)],
+  [POST/DELETE], [/quotes/{id}/likes], [Zitat liken / Like entfernen],
+  [POST/DELETE], [/comments/{id}/votes], [Kommentar bewerten],
+  [GET], [/users/{id}], [Öffentliches Profil],
   [POST], [/quotes/{id}/comments], [Top-Level-Kommentar],
   [POST], [/comments/{id}/replies], [Thread-Antwort],
   [DELETE], [/comments/{id}], [Kommentar löschen (Fetch)],
@@ -250,7 +277,7 @@ public/
 Alle Tests wurden manuell in Google Chrome unter XAMPP durchgeführt.
 
 #let test-data = (
-  tests: 26,
+  tests: 32,
   failures: 0,
   errors: 0,
   disabled: 0,
@@ -306,6 +333,21 @@ Alle Tests wurden manuell in Google Chrome unter XAMPP durchgeführt.
       ),
     ),
     (
+      name: "Forum & Interaktion",
+      tests: 6,
+      failures: 0,
+      errors: 0,
+      disabled: 0,
+      testsuite: (
+        (name: "T-FORUM-01: Feed-Sortierung top/trending", status: "passed", time: [manuell]),
+        (name: "T-FORUM-02: Zitat liken und entliken", status: "passed", time: [manuell]),
+        (name: "T-FORUM-03: Kommentar up-/downvoten", status: "passed", time: [manuell]),
+        (name: "T-FORUM-04: Kommentar-Sortierung auf Detailseite", status: "passed", time: [manuell]),
+        (name: "T-FORUM-05: Öffentliches Profil mit Kommentaren und Likes", status: "passed", time: [manuell]),
+        (name: "T-FORUM-06: Thread-Antworten und CASCADE-Löschung", status: "passed", time: [manuell]),
+      ),
+    ),
+    (
       name: "Sicherheit",
       tests: 3,
       failures: 0,
@@ -337,9 +379,9 @@ Alle Tests wurden manuell in Google Chrome unter XAMPP durchgeführt.
 == Schritte
 
 + ZIP entpacken
-+ In phpMyAdmin `sql/WEB4_PHP_TEAM4.sql` importieren
++ In phpMyAdmin `WEB4_PHP_TEAM7.sql` importieren
 + Apache DocumentRoot auf `public/` setzen
 + Anwendung unter `http://localhost/` aufrufen
 + Mit `admin` / `admin` einloggen
 
-Datenbank laut Projektangabe: `team_4`, User `fh_webphp`, Passwort `fh_webphp`.
+Datenbank: `team_7`, User `fh_webphp`, Passwort `fh_webphp`.

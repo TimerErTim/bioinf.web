@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-/*
- * Server-side validation only. JavaScript in the browser is not trusted.
- *
- * Each method returns an array of error strings. Empty array = input is OK.
- * Controllers merge errors and re-show the form if needed.
- */
 final class ValidationService
 {
     public static function username(?string $username): array
@@ -20,7 +14,7 @@ final class ValidationService
         if ($username === '') {
             $errors[] = 'Benutzername ist Pflicht.';
         } elseif (strlen($username) < 3 || strlen($username) > 50) {
-            $errors[] = 'Benutzername: 3-50 Zeichen.';
+            $errors[] = 'Benutzername: 3–50 Zeichen.';
         } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
             $errors[] = 'Benutzername: nur Buchstaben, Zahlen, Unterstrich.';
         }

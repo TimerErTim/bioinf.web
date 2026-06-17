@@ -2,10 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * App settings. This file returns an array (included via require in bootstrap.php).
- * Values match the project brief for XAMPP / phpMyAdmin import.
- */
 return [
     'app' => [
         'name' => 'GoT Quotes',

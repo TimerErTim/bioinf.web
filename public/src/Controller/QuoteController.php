@@ -85,7 +85,7 @@ final class QuoteController
 
         $this->likes->like(AuthService::userId(), $quoteId);
         Flash::success('Zitat gefällt dir.');
-        $this->redirectBack('/quotes/' . $quoteId);
+        Response::redirectBack('/quotes/' . $quoteId);
     }
 
     public function unlike(string $id): void
@@ -101,17 +101,6 @@ final class QuoteController
 
         $this->likes->unlike(AuthService::userId(), $quoteId);
         Flash::success('Like entfernt.');
-        $this->redirectBack('/quotes/' . $quoteId);
-    }
-
-    private function redirectBack(string $fallback): void
-    {
-        $referer = $_SERVER['HTTP_REFERER'] ?? '';
-        if (is_string($referer) && $referer !== '' && str_contains($referer, $_SERVER['HTTP_HOST'] ?? '')) {
-            header('Location: ' . $referer);
-            exit;
-        }
-
-        View::redirect($fallback);
+        Response::redirectBack('/quotes/' . $quoteId);
     }
 }

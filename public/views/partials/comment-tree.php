@@ -7,6 +7,7 @@ use App\Service\AuthService;
 require_once __DIR__ . '/avatar.php';
 require_once __DIR__ . '/delete-button.php';
 require_once __DIR__ . '/comment-vote.php';
+require_once __DIR__ . '/format.php';
 
 if (!function_exists('renderCommentAuthor')) {
     function renderCommentAuthor(array $comment): void
@@ -18,22 +19,6 @@ if (!function_exists('renderCommentAuthor')) {
 
         $url = userProfileUrl((int) $comment['user_id']);
         echo '<a href="' . Html::e($url) . '" class="font-medium text-stone-200 hover:text-amber-400 transition-colors">' . Html::e($comment['username']) . '</a>';
-    }
-}
-
-if (!function_exists('formatDateTime')) {
-    function formatDateTime(?string $datetime): string
-    {
-        if ($datetime === null) {
-            return '';
-        }
-
-        $timestamp = strtotime($datetime);
-        if ($timestamp === false) {
-            return Html::e($datetime);
-        }
-
-        return date('d.m.Y H:i', $timestamp);
     }
 }
 

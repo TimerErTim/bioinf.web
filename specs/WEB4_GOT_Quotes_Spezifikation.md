@@ -86,20 +86,26 @@ Die Anwendung erfüllt die Anforderungen der [Projektangabe](../WEB4_Projekt_Ang
 - Session invalidieren; Redirect zur Startseite.
 
 #### Profilbild (`GET /profile`, `POST /profile/avatar`, `DELETE /profile/avatar`)
-- Eingeloggte Nutzer können Avatar hochladen oder löschen (leerer Platzhalter mit Initialen).
+- Eingeloggte Nutzer können Avatar hochladen oder löschen (Platzhalter mit Initialen).
 - Validierung: max. 2 MB, nur `image/jpeg`, `image/png`, `image/webp`.
+
+#### Öffentliches Profil (`GET /users/{id}`)
+- Avatar, Benutzername, Kommentar-Anzahl, Gesamt-Score der Kommentare, Anzahl gelikter Zitate.
+- Liste eigener Kommentare (mit Link zum Zitat) und gelikter Zitate.
 
 ### 4.2 Zitate (Foren-Posts)
 
 #### Übersicht (`GET /` oder `GET /quotes`)
-- **Foren-Feed:** Karten pro Zitat — Zitat-Ausschnitt, Sprecher, optional Thumbnail, Kommentar-Anzahl, Datum.
-- Paginierung ab > 20 Einträgen empfohlen.
+- **Foren-Feed:** Karten pro Zitat — Zitat-Ausschnitt, Sprecher, optional Thumbnail, Kommentar-Anzahl, Like-Anzahl, Datum.
+- Sortierung: `?sort=new|top|trending` (Standard: neu).
+- Paginierung ab > 20 Einträgen.
 - Link zur Detail-/Thread-Seite.
 
 #### Detail (`GET /quotes/{id}`)
-- Vollständiger Zitat-Text (typografisch hervorgehoben), Sprecher, Staffel/Episode, optionales **Hero-Bild**.
-- Darunter: **Kommentar-Baum** (Top-Level + eingerückte Antworten).
-- Eingeloggt: Formular „Kommentar schreiben“; pro Kommentar „Antworten“-Button.
+- Vollständiger Zitat-Text, Sprecher, Staffel/Episode, optionales **Hero-Bild**.
+- Like-Button für eingeloggte Nutzer (`POST/DELETE /quotes/{id}/likes`).
+- **Kommentar-Baum** mit Sortierung `?csort=new|top|trending`.
+- Eingeloggt: Formular „Kommentar schreiben“; pro Kommentar „Antworten“ und Up/Down-Vote.
 - Bearbeiten/Löschen nur bei berechtigten Kommentaren (Löschen via Fetch `DELETE`).
 
 #### Admin: Zitat-Verwaltung
@@ -168,10 +174,15 @@ Route-Bereich: `/admin/users`
 | POST | `/login` | `AuthController::login` | |
 | POST | `/logout` | `AuthController::logout` | |
 | GET | `/profile` | `ProfileController::show` | Avatar-Verwaltung |
+| GET | `/users/{id}` | `ProfileController::showPublic` | Öffentliches Profil |
 | POST | `/profile/avatar` | `ProfileController::uploadAvatar` | |
 | DELETE | `/profile/avatar` | `ProfileController::deleteAvatar` | Fetch |
+| POST | `/quotes/{id}/likes` | `QuoteController::like` | Fetch |
+| DELETE | `/quotes/{id}/likes` | `QuoteController::unlike` | Fetch |
 | POST | `/quotes/{quoteId}/comments` | `CommentController::store` | Top-Level |
 | POST | `/comments/{parentId}/replies` | `CommentController::reply` | Thread-Antwort |
+| POST | `/comments/{id}/votes` | `CommentController::setVote` | Fetch |
+| DELETE | `/comments/{id}/votes` | `CommentController::removeVote` | Fetch |
 | GET | `/comments/{id}/edit` | `CommentController::edit` | HTML-Formular |
 | PUT | `/comments/{id}` | `CommentController::update` | Fetch oder Form `_method` |
 | DELETE | `/comments/{id}` | `CommentController::destroy` | **Fetch + CSRF** |
@@ -185,28 +196,16 @@ Route-Bereich: `/admin/users`
 | PUT | `/admin/quotes/{id}` | `Admin\QuoteController::update` | multipart |
 | DELETE | `/admin/quotes/{id}` | `Admin\QuoteController::destroy` | Fetch |
 
-### 5.3 Router-Erweiterung
+### 5.3 Router
 
-`Router` unterstützt zusätzlich: `put()`, `patch()`, `delete()`.  
-Für Browser-Formulare ohne Fetch: verstecktes Feld `_method` als Fallback (nur wo explizit dokumentiert); **Lösch-Aktionen ausschließlich per Fetch**.
+`Router` unterstützt `GET`, `POST`, `PUT`, `PATCH`, `DELETE`. Browser-Formulare ohne Fetch nutzen `_method` als Override (z. B. Kommentar-Bearbeitung). Lösch-Aktionen laufen über Fetch in `app.js` mit CSRF-Header.
 
-### 5.4 Client-seitiges JavaScript (`public/assets/js/app.js`)
+### 5.4 Client-JavaScript (`public/assets/js/app.js`)
 
-```javascript
-// Pseudocode — DELETE mit CSRF
-async function deleteResource(url, csrfToken) {
-  const res = await fetch(url, {
-    method: 'DELETE',
-    headers: { 'X-CSRF-Token': csrfToken, 'Accept': 'text/html' }
-  });
-  if (res.redirected) window.location = res.url;
-  else if (res.ok) window.location.reload();
-}
-```
-
-- Bestätigungsdialog vor DELETE (UX).
-- Keine Validierung — serverseitige Prüfung bleibt maßgeblich.
-- CSRF-Token aus `<meta name="csrf-token">` oder `data-csrf` am Button.
+- Fetch für `DELETE`, `PATCH`, Likes und Kommentar-Votes
+- CSRF-Token aus `<meta name="csrf-token">`
+- Bestätigungsdialog vor Löschungen
+- Toggle für Antwort-Formulare im Thread
 
 ---
 
@@ -256,7 +255,9 @@ public/
 │   ├── Model/
 │   │   ├── User.php
 │   │   ├── Quote.php
-│   │   └── Comment.php
+│   │   ├── Comment.php
+│   │   ├── QuoteLike.php
+│   │   └── CommentVote.php
 │   ├── Service/
 │   │   ├── AuthService.php
 │   │   ├── ValidationService.php
@@ -292,18 +293,29 @@ Unverändert: Controller → Model (PDO) → View (escaped HTML).
 ├─────────────┤       ├─────────────────────┤       ├─────────────┤
 │ id (PK)     │──┐    │ id (PK)             │    ┌──│ id (PK)     │
 │ username    │  │    │ quote_id (FK)       │───>│  │ text        │
-│ password    │  └───<│ user_id (FK)        │    │  │ speaker     │
-│ is_admin    │       │ parent_id (FK,self) │    │  │ season      │
-│ avatar_path │       │ content             │    │  │ episode     │
-│ created_at  │       │ created_at          │    │  │ image_path  │
-└─────────────┘       │ updated_at          │    │  │ created_at  │
-                      └─────────────────────┘    └──└─────────────┘
+│ password    │  ├───<│ user_id (FK)        │    │  │ speaker     │
+│ is_admin    │  │    │ parent_id (FK,self) │    │  │ season      │
+│ avatar_path │  │    │ content             │    │  │ episode     │
+│ created_at  │  │    │ created_at          │    │  │ image_path  │
+└─────────────┘  │    │ updated_at          │    │  │ created_at  │
+      │          │    └──────────┬──────────┘    └──└─────────────┘
+      │          │               │
+      │    ┌─────┴──────┐   ┌────┴────────────┐
+      │    │quote_likes │   │ comment_votes   │
+      │    ├────────────┤   ├─────────────────┤
+      └───>│ user_id FK │   │ comment_id (FK) │
+           │ quote_id FK│   │ user_id (FK)    │
+           │ created_at │   │ vote (±1)       │
+           └────────────┘   └─────────────────┘
 ```
 
 Beziehungen:
 - `comments.quote_id` → `quotes.id` (**ON DELETE CASCADE**)
 - `comments.user_id` → `users.id` (**ON DELETE SET NULL**)
 - `comments.parent_id` → `comments.id` (**ON DELETE CASCADE**, nullable)
+- `quote_likes` → `(user_id, quote_id)` mit CASCADE
+- `comment_votes.comment_id` → `comments.id` (**ON DELETE CASCADE**)
+- `comment_votes.user_id` → `users.id` (**ON DELETE SET NULL** — Votes bleiben erhalten)
 
 ### 8.2 Tabellendefinitionen
 
@@ -343,6 +355,28 @@ Beziehungen:
 | `updated_at` | `DATETIME` | NULL ON UPDATE CURRENT_TIMESTAMP |
 
 **Indizes:** `comments.quote_id`, `comments.user_id`, `comments.parent_id`
+
+#### `quote_likes`
+
+| Spalte | Typ | Constraints |
+|---|---|---|
+| `user_id` | `INT UNSIGNED` | FK → `users.id`, ON DELETE CASCADE |
+| `quote_id` | `INT UNSIGNED` | FK → `quotes.id`, ON DELETE CASCADE |
+| `created_at` | `DATETIME` | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
+
+Primärschlüssel: `(user_id, quote_id)`.
+
+#### `comment_votes`
+
+| Spalte | Typ | Constraints |
+|---|---|---|
+| `id` | `INT UNSIGNED` | PK, AUTO_INCREMENT |
+| `comment_id` | `INT UNSIGNED` | NOT NULL, FK → `comments.id`, ON DELETE CASCADE |
+| `user_id` | `INT UNSIGNED` | NULL, FK → `users.id`, ON DELETE SET NULL |
+| `vote` | `TINYINT` | NOT NULL, Werte `1` oder `-1` |
+| `created_at` | `DATETIME` | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
+
+Unique: `(comment_id, user_id)`.
 
 ### 8.3 Testdaten
 
@@ -436,13 +470,7 @@ Beziehungen:
 
 ## 11. Dokumentation (Typst)
 
-Quelle: [`doc/main.typ`](../doc/main.typ)
-
-**Anpassungen nach Refactoring:**
-- ER-Diagramm: `parent_id`, `avatar_path`, `image_path`
-- Architektur: REST-Routen, Router-Methoden, Fetch/DELETE
-- Frontend: Tailwind CDN statt Bootstrap
-- Testfälle: Thread-Antworten, Bild-Upload, REST-DELETE, Profilbild
+Quelle: [`doc/main.typ`](../doc/main.typ) — ER-Diagramm, REST-Routing, Sicherheit, Testfälle, Installation.
 
 ---
 
@@ -465,12 +493,16 @@ T-AUTH-01 … T-SEC-03 bleiben gültig (Routen ggf. anpassen).
 | T-IMG-03 | User lädt Avatar hoch → in Kommentaren sichtbar |
 | T-IMG-04 | User ohne Avatar → Initialen-Platzhalter |
 | T-UI-01 | Responsives Layout Tailwind — Mobile Feed lesbar |
+| T-LIKE-01 | User liked Zitat → Zähler steigt, erneuter Klick entfernt Like |
+| T-VOTE-01 | Up/Down-Vote auf Kommentar, Score-Anzeige |
+| T-SORT-01 | Feed und Kommentare sortierbar (new/top/trending) |
+| T-PROF-01 | Öffentliches Profil zeigt Kommentare und gelikte Zitate |
 
 ---
 
 ## 13. Entwicklungsumgebung
 
-Unverändert: Document Root `public/`, SQL-Dump `WEB4_PHP_TEAM4.sql`, Doku `doc/`.
+Document Root `public/`, SQL-Dump `WEB4_PHP_TEAM7.sql`, Doku `doc/`.
 
 ---
 
@@ -482,27 +514,11 @@ Zusätzlich zu bisherigen Punkten:
 - [ ] `assets/js/app.js` für DELETE-Fetch
 - [ ] Kein veraltetes Bootstrap/CSS
 - [ ] SQL-Dump enthält neue Spalten und Thread-Testdaten
-- [ ] Typst-Doku aktualisiert (REST, Threads, Uploads, Tailwind)
+- [ ] Typst-Doku aktualisiert
 
 ---
 
-## 15. Implementierungsreihenfolge (Refactoring)
-
-| Phase | Aufgabe |
-|---|---|
-| **R1** | Spezifikation & SQL-Schema (`parent_id`, Bild-Spalten) |
-| **R2** | Router: PUT/PATCH/DELETE; CSRF für non-GET |
-| **R3** | UploadService; uploads-Verzeichnis |
-| **R4** | Comment-Model: Baum laden/speichern; CASCADE |
-| **R5** | REST-Controller anpassen; Fetch-Löschen |
-| **R6** | Tailwind-Layout + Forum-Views |
-| **R7** | Profil/Avatar; Admin-Zitatbilder |
-| **R8** | `app.js`; Delete-Buttons überall |
-| **R9** | Typst-Doku + Testfälle + SQL-Dump final |
-
----
-
-## 16. Offene Entscheidungen (geklärt)
+## 15. Entscheidungen
 
 | # | Frage | Entscheidung |
 |---|---|---|
@@ -516,7 +532,7 @@ Zusätzlich zu bisherigen Punkten:
 
 ---
 
-## 17. Referenzen
+## 16. Referenzen
 
 - [WEB4_Projekt_Angabe.md](../WEB4_Projekt_Angabe.md)
 - [doc/main.typ](../doc/main.typ)
@@ -524,4 +540,4 @@ Zusätzlich zu bisherigen Punkten:
 
 ---
 
-*Stand: 17.06.2026 — REST, Forum-Threads, Bild-Uploads, Tailwind CSS 4.*
+*Stand: 17.06.2026 — Team 7, REST-Forum mit Threads, Likes, Votes, Uploads, Tailwind CSS 4.*

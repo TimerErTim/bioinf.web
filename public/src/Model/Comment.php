@@ -6,9 +6,6 @@ namespace App\Model;
 
 use PDO;
 
-/*
- * Comment table access with threaded replies (parent_id self-FK).
- */
 final class Comment
 {
     private PDO $db;
