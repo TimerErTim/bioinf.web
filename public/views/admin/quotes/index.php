@@ -32,7 +32,7 @@ require_once __DIR__ . '/../../partials/delete-button.php';
                     <td class="px-4 py-3 text-stone-500"><?= (int) $quote['id'] ?></td>
                     <td class="px-4 py-3 text-stone-300 max-w-xs truncate"><?= Html::e(mb_strlen($quote['text']) > 60 ? mb_substr($quote['text'], 0, 60) . '…' : $quote['text']) ?></td>
                     <td class="px-4 py-3 text-amber-500/90"><?= Html::e($quote['speaker']) ?></td>
-                    <td class="px-4 py-3 text-stone-500"><?= !empty($quote['image_path']) ? '✓' : '—' ?></td>
+                    <td class="px-4 py-3 text-stone-500"><?= !empty($quote['image_path']) ? '✓' : '-' ?></td>
                     <td class="px-4 py-3">
                         <div class="flex flex-wrap gap-2">
                             <a href="/quotes/<?= (int) $quote['id'] ?>" class="px-2 py-1 text-xs rounded-md border border-stone-700 text-stone-400 hover:text-amber-400">Ansehen</a>

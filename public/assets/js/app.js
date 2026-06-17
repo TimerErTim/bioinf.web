@@ -1,5 +1,5 @@
 /**
- * REST delete/patch helpers — server-side validation remains authoritative.
+ * REST delete/patch helpers - server-side validation remains authoritative.
  */
 (function () {
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';

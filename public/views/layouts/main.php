@@ -94,7 +94,7 @@ use App\Service\AuthService;
 
     <footer class="border-t border-stone-800 py-6 mt-auto">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center text-sm text-stone-500">
-            WEB4 PHP · Game of Thrones Quotes Forum · <em class="text-stone-600">Words are wind — but some linger forever.</em>
+            WEB4 PHP · Game of Thrones Quotes Forum · <em class="text-stone-600">Words are wind - but some linger forever.</em>
         </div>
     </footer>
     <script src="/assets/js/app.js" defer></script>

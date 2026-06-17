@@ -28,7 +28,7 @@ require_once __DIR__ . '/../partials/centered-page.php';
             <input type="text" id="username" name="username" required maxlength="50" pattern="[a-zA-Z0-9_]+" autocomplete="username"
                    value="<?= Html::e($username) ?>"
                    class="w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2 text-stone-100 focus:border-amber-600 focus:ring-1 focus:ring-amber-600 outline-none">
-            <p class="mt-1 text-xs text-stone-500">3–50 Zeichen, nur Buchstaben, Zahlen und Unterstriche.</p>
+            <p class="mt-1 text-xs text-stone-500">3-50 Zeichen, nur Buchstaben, Zahlen und Unterstriche.</p>
         </div>
         <div>
             <label for="password" class="block text-sm font-medium text-stone-300 mb-1">Passwort</label>

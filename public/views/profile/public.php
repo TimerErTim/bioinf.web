@@ -91,7 +91,7 @@ if (!function_exists('formatProfileScore')) {
                         <span>·</span>
                         <a href="/quotes/<?= (int) $comment['quote_id'] ?>" class="text-amber-500/90 hover:text-amber-400 transition-colors">
                             zu „<?= Html::e(mb_strlen($comment['quote_text']) > 50 ? mb_substr($comment['quote_text'], 0, 50) . '…' : $comment['quote_text']) ?>"
-                            — <?= Html::e($comment['quote_speaker']) ?>
+                            - <?= Html::e($comment['quote_speaker']) ?>
                         </a>
                     </div>
                 </li>

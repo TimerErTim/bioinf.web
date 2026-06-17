@@ -43,7 +43,7 @@ function commentSortUrl(int $quoteId, string $sort): string
         </blockquote>
         <footer class="mt-6 pt-6 border-t border-stone-800 flex flex-wrap items-center justify-between gap-4">
             <div class="flex flex-wrap items-center gap-3 text-stone-400">
-                <span class="text-amber-500 font-medium text-lg">— <?= Html::e($quote['speaker']) ?></span>
+                <span class="text-amber-500 font-medium text-lg">- <?= Html::e($quote['speaker']) ?></span>
                 <?php if (!empty($quote['season']) && !empty($quote['episode'])): ?>
                     <span class="text-sm rounded-full bg-stone-800 px-3 py-1">Staffel <?= (int) $quote['season'] ?> · Episode <?= (int) $quote['episode'] ?></span>
                 <?php endif; ?>

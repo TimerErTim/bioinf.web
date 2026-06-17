@@ -20,7 +20,7 @@ final class ValidationService
         if ($username === '') {
             $errors[] = 'Benutzername ist Pflicht.';
         } elseif (strlen($username) < 3 || strlen($username) > 50) {
-            $errors[] = 'Benutzername: 3–50 Zeichen.';
+            $errors[] = 'Benutzername: 3-50 Zeichen.';
         } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
             $errors[] = 'Benutzername: nur Buchstaben, Zahlen, Unterstrich.';
         }

@@ -27,7 +27,7 @@ if (!function_exists('renderQuoteCard')) {
                         „<?= Html::e($excerpt) ?>"
                     </blockquote>
                     <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-stone-500">
-                        <span class="text-amber-500/90 font-medium">— <?= Html::e($quote['speaker']) ?></span>
+                        <span class="text-amber-500/90 font-medium">- <?= Html::e($quote['speaker']) ?></span>
                         <?php if (!empty($quote['season']) && !empty($quote['episode'])): ?>
                             <span>S<?= str_pad((string) $quote['season'], 2, '0', STR_PAD_LEFT) ?>E<?= str_pad((string) $quote['episode'], 2, '0', STR_PAD_LEFT) ?></span>
                         <?php endif; ?>
