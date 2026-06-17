@@ -28,8 +28,8 @@ require_once __DIR__ . '/../../partials/delete-button.php';
                     <td class="px-4 py-3 text-stone-500"><?= (int) $user['id'] ?></td>
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-2">
-                            <?php renderAvatar($user, 'sm'); ?>
-                            <span class="text-stone-200"><?= Html::e($user['username']) ?></span>
+                            <?php renderAvatar($user, 'sm', true); ?>
+                            <a href="/users/<?= (int) $user['id'] ?>" class="text-stone-200 hover:text-amber-400 transition-colors"><?= Html::e($user['username']) ?></a>
                         </div>
                     </td>
                     <td class="px-4 py-3">

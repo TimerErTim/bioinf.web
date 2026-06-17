@@ -3,11 +3,14 @@
 use App\Csrf;
 use App\Html;
 
+require_once __DIR__ . '/../partials/centered-page.php';
+
 /** @var string $title */
 /** @var string $username */
 /** @var list<string> $errors */
 ?>
-<h1 class="text-2xl font-bold text-stone-100 mb-6">Login</h1>
+<?php openCenteredPage(); ?>
+<h1 class="text-2xl font-bold text-stone-100 mb-6 text-center">Login</h1>
 
 <?php if ($errors !== []): ?>
     <ul class="mb-4 space-y-1 text-sm text-red-400 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3">
@@ -17,7 +20,7 @@ use App\Html;
     </ul>
 <?php endif; ?>
 
-<div class="rounded-2xl border border-stone-800 bg-stone-900/50 p-6 max-w-md">
+<div class="rounded-2xl border border-stone-800 bg-stone-900/50 p-6 sm:p-8 shadow-xl shadow-black/20">
     <form method="post" action="/login" class="space-y-4">
         <?= Csrf::field() ?>
         <div>
@@ -35,5 +38,6 @@ use App\Html;
     </form>
 </div>
 
-<p class="mt-4 text-sm text-stone-500">Noch kein Konto? <a href="/register" class="text-amber-500 hover:text-amber-400">Registrieren</a></p>
-<p class="mt-2 text-xs text-stone-600">Demo-Admin: admin / admin</p>
+<p class="mt-6 text-sm text-stone-500 text-center">Noch kein Konto? <a href="/register" class="text-amber-500 hover:text-amber-400">Registrieren</a></p>
+<p class="mt-2 text-xs text-stone-600 text-center">Demo-Admin: admin / admin</p>
+<?php closeCenteredPage(); ?>

@@ -89,6 +89,14 @@ final class User
         return (int) $stmt->fetchColumn();
     }
 
+    public function countComments(int $userId): int
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM comments WHERE user_id = :user_id');
+        $stmt->execute(['user_id' => $userId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     public function verifyPassword(array $user, string $password): bool
     {
         return password_verify($password, $user['password_hash']);

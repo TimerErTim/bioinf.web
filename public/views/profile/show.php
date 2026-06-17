@@ -5,12 +5,14 @@ use App\Html;
 
 require_once __DIR__ . '/../partials/avatar.php';
 require_once __DIR__ . '/../partials/delete-button.php';
+require_once __DIR__ . '/../partials/centered-page.php';
 
 /** @var string $title */
 /** @var array<string, mixed> $user */
 /** @var list<string> $errors */
 ?>
-<h1 class="text-2xl font-bold text-stone-100 mb-6">Profil</h1>
+<?php openCenteredPage('lg'); ?>
+<h1 class="text-2xl font-bold text-stone-100 mb-6 text-center">Profil</h1>
 
 <?php if ($errors !== []): ?>
     <ul class="mb-4 space-y-1 text-sm text-red-400 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3">
@@ -20,12 +22,13 @@ require_once __DIR__ . '/../partials/delete-button.php';
     </ul>
 <?php endif; ?>
 
-<div class="rounded-2xl border border-stone-800 bg-stone-900/50 p-6 max-w-lg">
-    <div class="flex items-center gap-4 mb-6">
+<div class="rounded-2xl border border-stone-800 bg-stone-900/50 p-6 sm:p-8 shadow-xl shadow-black/20">
+    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6 text-center sm:text-left">
         <?php renderAvatar($user, 'lg'); ?>
         <div>
             <p class="text-lg font-semibold text-stone-100"><?= Html::e($user['username']) ?></p>
             <p class="text-sm text-stone-500">Mitglied seit <?= Html::e(date('d.m.Y', strtotime($user['created_at']))) ?></p>
+            <a href="/users/<?= (int) $user['id'] ?>" class="inline-block mt-2 text-sm text-amber-500 hover:text-amber-400">Öffentliches Profil ansehen →</a>
         </div>
     </div>
 
@@ -44,3 +47,4 @@ require_once __DIR__ . '/../partials/delete-button.php';
         <?php renderDeleteButton('/profile/avatar', 'Profilbild entfernen', 'Profilbild wirklich entfernen?'); ?>
     <?php endif; ?>
 </div>
+<?php closeCenteredPage(); ?>

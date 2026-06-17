@@ -32,6 +32,7 @@ $router->post('/login', fn () => $auth->login());
 $router->post('/logout', fn () => $auth->logout());
 
 $router->get('/profile', fn () => $profile->show());
+$router->get('/users/{id}', fn (string $id) => $profile->showPublic($id));
 $router->post('/profile/avatar', fn () => $profile->uploadAvatar());
 $router->delete('/profile/avatar', fn () => $profile->deleteAvatar());
 

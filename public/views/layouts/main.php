@@ -48,8 +48,15 @@ use App\Service\AuthService;
                             <li><a href="/admin/quotes" class="px-3 py-2 rounded-lg text-stone-400 hover:text-amber-400 hover:bg-stone-800/80 transition-colors">Zitate</a></li>
                         <?php endif; ?>
                         <li class="flex items-center gap-2 pl-2 border-l border-stone-800">
-                            <?php require_once __DIR__ . '/../partials/avatar.php'; renderAvatar(['username' => AuthService::username(), 'avatar_path' => AuthService::avatarPath()], 'sm'); ?>
-                            <span class="text-stone-400 hidden sm:inline"><?= Html::e(AuthService::username()) ?></span>
+                            <?php
+                            require_once __DIR__ . '/../partials/avatar.php';
+                            renderAvatar(
+                                ['user_id' => AuthService::userId(), 'username' => AuthService::username(), 'avatar_path' => AuthService::avatarPath()],
+                                'sm',
+                                true,
+                            );
+                            ?>
+                            <a href="/users/<?= (int) AuthService::userId() ?>" class="text-stone-400 hidden sm:inline hover:text-amber-400 transition-colors"><?= Html::e(AuthService::username()) ?></a>
                         </li>
                         <li>
                             <form method="post" action="/logout" class="inline">

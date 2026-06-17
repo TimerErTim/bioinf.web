@@ -15,7 +15,8 @@ if (!function_exists('renderCommentAuthor')) {
             return;
         }
 
-        echo '<span class="font-medium text-stone-200">' . Html::e($comment['username']) . '</span>';
+        $url = userProfileUrl((int) $comment['user_id']);
+        echo '<a href="' . Html::e($url) . '" class="font-medium text-stone-200 hover:text-amber-400 transition-colors">' . Html::e($comment['username']) . '</a>';
     }
 }
 
@@ -55,7 +56,7 @@ if (!function_exists('renderCommentTree')) {
                      class="relative border-l-2 border-stone-800 pl-4 py-4"
                      style="margin-left: <?= $indent ?>px">
                 <div class="flex gap-3">
-                    <?php renderAvatar($comment, 'md'); ?>
+                    <?php renderAvatar($comment, 'md', true); ?>
                     <div class="flex-1 min-w-0">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
                             <div class="text-sm">

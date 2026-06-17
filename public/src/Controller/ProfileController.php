@@ -38,6 +38,22 @@ final class ProfileController
         ]);
     }
 
+    public function showPublic(string $id): void
+    {
+        $userId = (int) $id;
+        $user = $this->users->findById($userId);
+        if ($user === null) {
+            Response::notFound();
+        }
+
+        View::render('profile/public', [
+            'title' => $user['username'],
+            'user' => $user,
+            'commentCount' => $this->users->countComments($userId),
+            'isOwnProfile' => AuthService::userId() === $userId,
+        ]);
+    }
+
     public function uploadAvatar(): void
     {
         Response::requirePost();
