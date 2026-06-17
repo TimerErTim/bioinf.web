@@ -65,7 +65,7 @@
 }
 
 #let parse-httpyac-junit(path) = {
-  let root = xml(path)
+  let root = xml("../" + path)
   let suites = ()
   for node in root {
     if not _is-element(node) {

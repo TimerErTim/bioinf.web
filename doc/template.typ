@@ -109,6 +109,7 @@
   // Global init
   show: catppuccin.with(theme)
   set page(fill: white)
+  set text(fill: black)
   show: codly-init.with()
 
   set page(
