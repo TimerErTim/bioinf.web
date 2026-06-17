@@ -3,8 +3,8 @@
 use App\Csrf;
 use App\Html;
 
-require __DIR__ . '/../partials/avatar.php';
-require __DIR__ . '/../partials/delete-button.php';
+require_once __DIR__ . '/../partials/avatar.php';
+require_once __DIR__ . '/../partials/delete-button.php';
 
 /** @var string $title */
 /** @var array<string, mixed> $user */

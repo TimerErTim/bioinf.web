@@ -2,7 +2,7 @@
 
 use App\Html;
 
-require __DIR__ . '/../../partials/delete-button.php';
+require_once __DIR__ . '/../../partials/delete-button.php';
 
 /** @var string $title */
 /** @var list<array<string, mixed>> $quotes */

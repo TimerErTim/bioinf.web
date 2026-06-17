@@ -4,7 +4,7 @@ use App\Csrf;
 use App\Html;
 use App\Service\AuthService;
 
-require __DIR__ . '/../partials/comment-tree.php';
+require_once __DIR__ . '/../partials/comment-tree.php';
 
 /** @var string $title */
 /** @var array<string, mixed> $quote */
