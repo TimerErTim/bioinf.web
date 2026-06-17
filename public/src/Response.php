@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App;
 
-// HTTP helpers: 403, 404, check POST and CSRF
+/*
+ * Small HTTP helpers used by controllers before doing work.
+ *
+ * Mutating actions (delete, update, login) should use POST, not GET.
+ * GET links can be prefetched or opened by accident; POST + CSRF is safer.
+ */
 final class Response
 {
     public static function forbidden(): void
@@ -31,6 +36,7 @@ final class Response
 
     public static function requireCsrf(): void
     {
+        // $_POST contains form fields from the request body (POST only).
         if (!Csrf::validate($_POST['_csrf'] ?? null)) {
             Flash::error('Sicherheits-Token ungültig. Bitte nochmal versuchen.');
             View::redirect('/');

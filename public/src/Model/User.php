@@ -6,7 +6,15 @@ namespace App\Model;
 
 use PDO;
 
-// Users in the database
+/*
+ * User table access. Each method runs SQL via PDO.
+ *
+ * Pattern used everywhere in models:
+ *   $stmt = $db->prepare('... WHERE id = :id');  // :id is a placeholder
+ *   $stmt->execute(['id' => $id]);                 // values are bound safely
+ *
+ * Never build SQL with string concatenation and user input.
+ */
 final class User
 {
     private PDO $db;
@@ -79,6 +87,7 @@ final class User
         return (int) $stmt->fetchColumn();
     }
 
+    /** Compare plain password with bcrypt hash from database. */
     public function verifyPassword(array $user, string $password): bool
     {
         return password_verify($password, $user['password_hash']);

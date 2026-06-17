@@ -69,6 +69,7 @@ $isAdmin = AuthService::isAdmin();
                         </div>
                     <?php endif; ?>
                 </div>
+                        <?php // nl2br keeps line breaks; Html::e escapes HTML from user comments ?>
                 <p><?= nl2br(Html::e($comment['content'])) ?></p>
             </div>
         <?php endforeach; ?>

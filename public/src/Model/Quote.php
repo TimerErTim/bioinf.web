@@ -6,7 +6,7 @@ namespace App\Model;
 
 use PDO;
 
-// Read and save quotes from the database
+// Quote table access. See User.php for the prepare/execute pattern.
 final class Quote
 {
     private PDO $db;
@@ -26,6 +26,10 @@ final class Quote
              ORDER BY q.created_at DESC
              LIMIT :limit OFFSET :offset',
         );
+        /*
+         * LIMIT values must be integers. bindValue(..., PDO::PARAM_INT) tells PDO
+         * they are numbers, not strings (MySQL rejects LIMIT "20" in some setups).
+         */
         $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
         $stmt->execute();

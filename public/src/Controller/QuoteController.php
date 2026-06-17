@@ -10,7 +10,7 @@ use App\Model\Quote;
 use App\Response;
 use App\View;
 
-// Quote list and detail page (public)
+// Public quote pages (no login required to read).
 final class QuoteController
 {
     private const PAGE_SIZE = 20;
@@ -27,6 +27,7 @@ final class QuoteController
 
     public function index(): void
     {
+        // Pagination via ?page=2 in query string ($_GET).
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $total = $this->quotes->countAll();
         $totalPages = max(1, (int) ceil($total / self::PAGE_SIZE));

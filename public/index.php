@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * Entry point. Every request starts here.
+/*
+ * Front controller (single entry point for all pages).
+ *
+ * Apache sends every request here (.htaccess). We map the URL to a controller
+ * method. This is our small MVC router, not a framework like Spring or Laravel.
+ *
+ * "use ..." imports classes (like Java import). Namespaces avoid name clashes.
  */
 
 use App\Controller\Admin\QuoteController as AdminQuoteController;
@@ -17,12 +22,17 @@ $config = require __DIR__ . '/src/bootstrap.php';
 
 $router = new Router();
 
+// One controller instance per area. $config holds DB settings for models.
 $auth = new AuthController($config);
 $quotes = new QuoteController($config);
 $comments = new CommentController($config);
 $adminUsers = new AdminUserController($config);
 $adminQuotes = new AdminQuoteController($config);
 
+/*
+ * Register routes. {id} is a URL parameter, e.g. /quotes/3 -> id = "3".
+ * fn () => ... is a short anonymous function (arrow function), like Java lambda.
+ */
 $router->get('/', fn () => $quotes->index());
 $router->get('/quotes/{id}', fn (string $id) => $quotes->show($id));
 
@@ -48,6 +58,7 @@ $router->get('/admin/quotes/{id}/edit', fn (string $id) => $adminQuotes->update(
 $router->post('/admin/quotes/{id}/edit', fn (string $id) => $adminQuotes->update($id));
 $router->post('/admin/quotes/{id}/delete', fn (string $id) => $adminQuotes->delete($id));
 
+// $_SERVER is a PHP superglobal with request info from the web server.
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
 

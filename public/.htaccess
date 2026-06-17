@@ -1,8 +1,8 @@
 RewriteEngine On
 
-# Serve existing files and directories directly
+# If the URL is not a real file (css, images) or folder, send it to index.php.
+# This enables clean URLs like /quotes/5 instead of /index.php?route=...
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Route everything else to the front controller
 RewriteRule ^ index.php [L,QSA]

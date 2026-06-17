@@ -2,7 +2,12 @@
 
 use App\Html;
 
-// Show author name. Gray <deleted> if user was removed.
+/*
+ * View helper functions (included from quotes/show.php).
+ * Not a class: plain functions are fine for small template helpers.
+ */
+
+// Show author name. Gray <deleted> if user was removed from database.
 function renderCommentAuthor(array $comment): void
 {
     if ($comment['user_id'] === null || $comment['username'] === null) {

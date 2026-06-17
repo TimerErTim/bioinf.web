@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// Optional: use another MySQL port if needed (e.g. 33060 instead of 3306)
+// Copy this file to config.local.php to override settings on your machine.
 return [
     'db' => [
         'port' => 33060,

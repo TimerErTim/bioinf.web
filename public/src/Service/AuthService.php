@@ -8,11 +8,22 @@ use App\Flash;
 use App\Response;
 use App\View;
 
-// Login state in $_SESSION (session_start() runs in bootstrap.php)
+/*
+ * Keeps login state in $_SESSION (server-side, per browser session).
+ *
+ * Similar role to HttpSession in Java servlets, but PHP uses the $_SESSION
+ * superglobal array instead of session.getAttribute().
+ *
+ * We never store passwords in the session, only user id, username, and admin flag.
+ */
 final class AuthService
 {
     public static function login(int $userId, string $username, bool $isAdmin): void
     {
+        /*
+         * New session ID after login reduces session fixation risk
+         * (attacker cannot reuse an old session id they gave the victim).
+         */
         session_regenerate_id(true);
         $_SESSION['user_id'] = $userId;
         $_SESSION['username'] = $username;
@@ -45,6 +56,7 @@ final class AuthService
         return !empty($_SESSION['is_admin']);
     }
 
+    /** Redirect to login if not authenticated. */
     public static function requireLogin(): void
     {
         if (!self::check()) {
@@ -53,6 +65,7 @@ final class AuthService
         }
     }
 
+    /** requireLogin + must be admin, otherwise 403. */
     public static function requireAdmin(): void
     {
         self::requireLogin();

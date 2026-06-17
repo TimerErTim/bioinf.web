@@ -6,7 +6,12 @@ namespace App\Model;
 
 use PDO;
 
-// Comments on quotes
+/*
+ * Comment table access.
+ *
+ * LEFT JOIN users: keep comments even when user_id is NULL (deleted author).
+ * username comes from join; NULL username means show <deleted> in the view.
+ */
 final class Comment
 {
     private PDO $db;

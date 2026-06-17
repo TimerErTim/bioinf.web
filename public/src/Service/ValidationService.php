@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-// Check form input on the server
+/*
+ * Server-side validation only. JavaScript in the browser is not trusted.
+ *
+ * Each method returns an array of error strings. Empty array = input is OK.
+ * Controllers merge errors and re-show the form if needed.
+ */
 final class ValidationService
 {
     public static function username(?string $username): array

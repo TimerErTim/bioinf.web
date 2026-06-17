@@ -11,7 +11,7 @@ use App\Response;
 use App\Service\AuthService;
 use App\View;
 
-// Admin: manage users
+// Admin user list, role toggle, delete. Protects last remaining admin.
 final class UserController
 {
     private User $users;
@@ -45,6 +45,7 @@ final class UserController
             Response::notFound();
         }
 
+        // Cannot demote or delete yourself, or remove the last admin account.
         if ($targetId === AuthService::userId()) {
             Flash::error('Eigene Admin-Rolle kannst du nicht ändern.');
             View::redirect('/admin/users');

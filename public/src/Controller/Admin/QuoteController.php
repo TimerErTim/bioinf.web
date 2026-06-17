@@ -12,7 +12,7 @@ use App\Service\AuthService;
 use App\Service\ValidationService;
 use App\View;
 
-// Admin: create, edit and delete quotes
+// Admin quote CRUD. requireAdmin() runs at start of each action.
 final class QuoteController
 {
     private Quote $quotes;
@@ -36,6 +36,7 @@ final class QuoteController
     {
         AuthService::requireAdmin();
 
+        // Same URL for GET (show form) and POST (save). Check method inside.
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleSave(null);
             return;

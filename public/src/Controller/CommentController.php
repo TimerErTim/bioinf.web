@@ -13,7 +13,7 @@ use App\Service\AuthService;
 use App\Service\ValidationService;
 use App\View;
 
-// Comments: create, edit, delete
+// Comments: create, edit, delete. Main CRUD resource for logged-in users.
 final class CommentController
 {
     private Quote $quotes;
@@ -52,6 +52,7 @@ final class CommentController
             return;
         }
 
+        // user_id always comes from session, never from hidden form fields.
         $this->comments->create($quoteId, AuthService::userId(), $content);
         Flash::success('Kommentar gespeichert.');
         View::redirect('/quotes/' . $quoteId);
@@ -104,6 +105,7 @@ final class CommentController
             Response::notFound();
         }
 
+        // Owner can delete own comment; admin can delete any comment (not edit others).
         $userId = AuthService::userId();
         $isOwner = $comment['user_id'] !== null && (int) $comment['user_id'] === $userId;
         $isAdmin = AuthService::isAdmin();
@@ -117,6 +119,10 @@ final class CommentController
         View::redirect('/quotes/' . $comment['quote_id']);
     }
 
+    /**
+     * IDOR check: only the author may edit a comment.
+     * (Insecure Direct Object Reference = changing {id} in URL to access others' data.)
+     */
     private function loadOwnedComment(int $commentId): array
     {
         $comment = $this->comments->findById($commentId);

@@ -12,7 +12,7 @@ use App\Service\AuthService;
 use App\Service\ValidationService;
 use App\View;
 
-// Register, login, logout
+// Register, login, logout. Handles $_POST form data from auth views.
 final class AuthController
 {
     private User $users;
@@ -68,6 +68,10 @@ final class AuthController
             return;
         }
 
+        /*
+         * password_hash creates a one-way bcrypt hash for storage.
+         * Never save plain passwords. PASSWORD_DEFAULT picks a secure algorithm.
+         */
         $this->users->create($username, password_hash($password, PASSWORD_DEFAULT));
         Flash::success('Registrierung erfolgreich. Bitte einloggen.');
         View::redirect('/login');

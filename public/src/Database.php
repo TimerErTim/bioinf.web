@@ -7,7 +7,12 @@ namespace App;
 use PDO;
 use PDOException;
 
-// PDO connection to MySQL
+/*
+ * PDO = PHP Data Objects. Database access API (like JDBC in Java).
+ *
+ * We use one shared connection per request (static $connection).
+ * Prepared statements with :placeholders prevent SQL injection.
+ */
 final class Database
 {
     private static ?PDO $connection = null;
@@ -18,6 +23,7 @@ final class Database
             return self::$connection;
         }
 
+        // DSN = connection string (host, port, database name, charset).
         $dsn = sprintf(
             'mysql:host=%s;port=%d;dbname=%s;charset=%s',
             $dbConfig['host'],
@@ -28,7 +34,9 @@ final class Database
 
         try {
             self::$connection = new PDO($dsn, $dbConfig['username'], $dbConfig['password'], [
+                // Throw exceptions on SQL errors instead of silent failures.
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                // fetch() returns associative arrays ['id' => 1, 'name' => '...'].
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ]);
         } catch (PDOException $exception) {

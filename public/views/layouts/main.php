@@ -4,9 +4,10 @@ use App\Csrf;
 use App\Html;
 use App\Service\AuthService;
 
-/** @var string $title */
-/** @var string $content */
-/** @var list<array{type: string, message: string}> $flashMessages */
+/*
+ * Main layout. View::render() sets $title, $content, and $flashMessages
+ * before including this file (see extract() in View.php).
+ */
 ?>
 <!DOCTYPE html>
 <html lang="de">
