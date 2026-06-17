@@ -219,6 +219,7 @@ public/
   [CSRF], [Token in allen POST-Formularen, Validierung in Controllern],
   [IDOR], [Berechtigungsprüfung: Kommentar-Bearbeitung nur für Autor],
   [Passwörter], [`password_hash()` / `password_verify()`, PASSWORD_DEFAULT],
+  [Kein JS], [Kein striktes REST #sym.arrow ausschließlich standard Form Methods reichen aus]
 )
 
 = Testfälle
