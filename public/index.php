@@ -24,6 +24,8 @@ $adminQuotes = new AdminQuoteController($config);
 $router->get('/', fn () => $quotes->index());
 $router->get('/quotes', fn () => $quotes->index());
 $router->get('/quotes/{id}', fn (string $id) => $quotes->show($id));
+$router->post('/quotes/{id}/likes', fn (string $id) => $quotes->like($id));
+$router->delete('/quotes/{id}/likes', fn (string $id) => $quotes->unlike($id));
 
 $router->get('/register', fn () => $auth->showRegister());
 $router->post('/register', fn () => $auth->register());

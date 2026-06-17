@@ -6,6 +6,8 @@ namespace App\Controller;
 
 use App\Database;
 use App\Flash;
+use App\Model\Comment;
+use App\Model\QuoteLike;
 use App\Model\User;
 use App\Response;
 use App\Service\AuthService;
@@ -15,10 +17,15 @@ use App\View;
 final class ProfileController
 {
     private User $users;
+    private Comment $comments;
+    private QuoteLike $likes;
 
     public function __construct(array $config)
     {
-        $this->users = new User(Database::connection($config['db']));
+        $pdo = Database::connection($config['db']);
+        $this->users = new User($pdo);
+        $this->comments = new Comment($pdo);
+        $this->likes = new QuoteLike($pdo);
     }
 
     public function show(): void
@@ -50,8 +57,29 @@ final class ProfileController
             'title' => $user['username'],
             'user' => $user,
             'commentCount' => $this->users->countComments($userId),
+            'likeCount' => $this->likes->countByUserId($userId),
+            'comments' => $this->comments->findByUserId($userId),
+            'likedQuotes' => $this->enrichQuotesForViewer($this->likes->findQuotesByUserId($userId)),
             'isOwnProfile' => AuthService::userId() === $userId,
         ]);
+    }
+
+    /** @param list<array<string, mixed>> $quotes */
+    private function enrichQuotesForViewer(array $quotes): array
+    {
+        $viewerId = AuthService::userId();
+        if ($viewerId === null) {
+            foreach ($quotes as &$quote) {
+                $quote['user_liked'] = 0;
+            }
+            return $quotes;
+        }
+
+        foreach ($quotes as &$quote) {
+            $quote['user_liked'] = $this->likes->hasLiked($viewerId, (int) $quote['id']) ? 1 : 0;
+        }
+
+        return $quotes;
     }
 
     public function uploadAvatar(): void

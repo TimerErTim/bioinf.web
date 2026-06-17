@@ -28,7 +28,7 @@ final class QuoteController
 
         View::render('admin/quotes/index', [
             'title' => 'Zitate verwalten',
-            'quotes' => $this->quotes->findAll(),
+            'quotes' => $this->quotes->findAll(500, 0),
         ]);
     }
 

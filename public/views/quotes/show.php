@@ -5,6 +5,7 @@ use App\Html;
 use App\Service\AuthService;
 
 require_once __DIR__ . '/../partials/comment-tree.php';
+require_once __DIR__ . '/../partials/like-button.php';
 
 /** @var string $title */
 /** @var array<string, mixed> $quote */
@@ -28,11 +29,19 @@ require_once __DIR__ . '/../partials/comment-tree.php';
         <blockquote class="quote-serif text-2xl sm:text-3xl text-stone-100 leading-relaxed italic -mt-8">
             <?= Html::e($quote['text']) ?>
         </blockquote>
-        <footer class="mt-6 pt-6 border-t border-stone-800 flex flex-wrap items-center gap-3 text-stone-400">
-            <span class="text-amber-500 font-medium text-lg">— <?= Html::e($quote['speaker']) ?></span>
-            <?php if (!empty($quote['season']) && !empty($quote['episode'])): ?>
-                <span class="text-sm rounded-full bg-stone-800 px-3 py-1">Staffel <?= (int) $quote['season'] ?> · Episode <?= (int) $quote['episode'] ?></span>
-            <?php endif; ?>
+        <footer class="mt-6 pt-6 border-t border-stone-800 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-3 text-stone-400">
+                <span class="text-amber-500 font-medium text-lg">— <?= Html::e($quote['speaker']) ?></span>
+                <?php if (!empty($quote['season']) && !empty($quote['episode'])): ?>
+                    <span class="text-sm rounded-full bg-stone-800 px-3 py-1">Staffel <?= (int) $quote['season'] ?> · Episode <?= (int) $quote['episode'] ?></span>
+                <?php endif; ?>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <?php renderLikeButton($quote); ?>
+                <span class="inline-flex items-center gap-1 rounded-full bg-stone-800 px-3 py-1 text-sm text-stone-400">
+                    <?= (int) $commentCount ?> <?= (int) $commentCount === 1 ? 'Antwort' : 'Antworten' ?>
+                </span>
+            </div>
         </footer>
     </div>
 </article>

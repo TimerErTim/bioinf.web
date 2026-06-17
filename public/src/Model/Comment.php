@@ -92,6 +92,24 @@ final class Comment
         return $stmt->execute(['id' => $id]);
     }
 
+    /** @return list<array<string, mixed>> */
+    public function findByUserId(int $userId, int $limit = 50): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT c.*, q.text AS quote_text, q.speaker AS quote_speaker
+             FROM comments c
+             INNER JOIN quotes q ON q.id = c.quote_id
+             WHERE c.user_id = :user_id
+             ORDER BY c.created_at DESC
+             LIMIT :limit',
+        );
+        $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
     /**
      * @param list<array<string, mixed>> $flat
      * @return list<array<string, mixed>>

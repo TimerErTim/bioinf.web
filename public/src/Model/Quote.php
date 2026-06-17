@@ -15,16 +15,42 @@ final class Quote
         $this->db = $db;
     }
 
-    public function findAll(int $limit = 100, int $offset = 0): array
+    /** @return list<array<string, mixed>> */
+    public function findAll(int $limit, int $offset, string $sort = 'new', ?int $viewerUserId = null): array
     {
-        $stmt = $this->db->prepare(
-            'SELECT q.*, COUNT(c.id) AS comment_count
-             FROM quotes q
-             LEFT JOIN comments c ON c.quote_id = q.id
-             GROUP BY q.id
-             ORDER BY q.created_at DESC
-             LIMIT :limit OFFSET :offset',
-        );
+        $viewerId = $viewerUserId ?? 0;
+        $orderBy = match ($sort) {
+            'top' => 'like_count DESC, q.created_at DESC',
+            'trending' => 'trend_score DESC, q.created_at DESC',
+            default => 'q.created_at DESC',
+        };
+
+        $sql = "SELECT q.*,
+                   stats.comment_count,
+                   stats.like_count,
+                   stats.trend_score,
+                   CASE WHEN vl.id IS NOT NULL THEN 1 ELSE 0 END AS user_liked
+            FROM quotes q
+            INNER JOIN (
+                SELECT qo.id,
+                       (SELECT COUNT(*) FROM comments c WHERE c.quote_id = qo.id) AS comment_count,
+                       (SELECT COUNT(*) FROM quote_likes ql WHERE ql.quote_id = qo.id) AS like_count,
+                       (
+                           (SELECT COUNT(*) FROM quote_likes ql2
+                            WHERE ql2.quote_id = qo.id
+                              AND ql2.created_at >= NOW() - INTERVAL 7 DAY)
+                           + (SELECT COUNT(*) FROM comments c2
+                              WHERE c2.quote_id = qo.id
+                                AND c2.created_at >= NOW() - INTERVAL 7 DAY)
+                       ) AS trend_score
+                FROM quotes qo
+            ) stats ON stats.id = q.id
+            LEFT JOIN quote_likes vl ON vl.quote_id = q.id AND vl.user_id = :viewer_id
+            ORDER BY {$orderBy}
+            LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue('viewer_id', $viewerId, PDO::PARAM_INT);
         $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -32,18 +58,44 @@ final class Quote
         return $stmt->fetchAll();
     }
 
-    public function countAll(): int
+    public function findById(int $id, ?int $viewerUserId = null): ?array
     {
-        return (int) $this->db->query('SELECT COUNT(*) FROM quotes')->fetchColumn();
-    }
+        $viewerId = $viewerUserId ?? 0;
 
-    public function findById(int $id): ?array
-    {
-        $stmt = $this->db->prepare('SELECT * FROM quotes WHERE id = :id');
-        $stmt->execute(['id' => $id]);
+        $stmt = $this->db->prepare(
+            'SELECT q.*,
+                    stats.comment_count,
+                    stats.like_count,
+                    stats.trend_score,
+                    CASE WHEN vl.id IS NOT NULL THEN 1 ELSE 0 END AS user_liked
+             FROM quotes q
+             INNER JOIN (
+                 SELECT qo.id,
+                        (SELECT COUNT(*) FROM comments c WHERE c.quote_id = qo.id) AS comment_count,
+                        (SELECT COUNT(*) FROM quote_likes ql WHERE ql.quote_id = qo.id) AS like_count,
+                        (
+                            (SELECT COUNT(*) FROM quote_likes ql2
+                             WHERE ql2.quote_id = qo.id
+                               AND ql2.created_at >= NOW() - INTERVAL 7 DAY)
+                            + (SELECT COUNT(*) FROM comments c2
+                               WHERE c2.quote_id = qo.id
+                                 AND c2.created_at >= NOW() - INTERVAL 7 DAY)
+                        ) AS trend_score
+                 FROM quotes qo
+                 WHERE qo.id = :quote_id
+             ) stats ON stats.id = q.id
+             LEFT JOIN quote_likes vl ON vl.quote_id = q.id AND vl.user_id = :viewer_id
+             WHERE q.id = :quote_id_lookup',
+        );
+        $stmt->execute(['quote_id' => $id, 'quote_id_lookup' => $id, 'viewer_id' => $viewerId]);
 
         $row = $stmt->fetch();
         return $row ?: null;
+    }
+
+    public function countAll(): int
+    {
+        return (int) $this->db->query('SELECT COUNT(*) FROM quotes')->fetchColumn();
     }
 
     public function create(array $data): int
@@ -87,5 +139,13 @@ final class Quote
         $stmt = $this->db->prepare('DELETE FROM quotes WHERE id = :id');
 
         return $stmt->execute(['id' => $id]);
+    }
+
+    public static function normalizeSort(?string $sort): string
+    {
+        return match ($sort) {
+            'top', 'trending' => $sort,
+            default => 'new',
+        };
     }
 }

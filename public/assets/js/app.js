@@ -50,4 +50,31 @@
             form?.querySelector('textarea')?.focus();
         });
     });
+
+    document.querySelectorAll('[data-like-toggle]').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const url = btn.dataset.likeToggle;
+            const liked = btn.dataset.liked === '1';
+            const method = liked ? 'DELETE' : 'POST';
+
+            const res = await fetch(url, {
+                method,
+                headers: {
+                    'X-CSRF-Token': csrf,
+                    Accept: 'text/html',
+                },
+                redirect: 'follow',
+            });
+
+            if (res.redirected) {
+                window.location.href = res.url;
+                return;
+            }
+
+            if (res.ok) {
+                window.location.reload();
+            }
+        });
+    });
 })();

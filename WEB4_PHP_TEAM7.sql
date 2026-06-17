@@ -12,6 +12,7 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS `comments`;
+DROP TABLE IF EXISTS `quote_likes`;
 DROP TABLE IF EXISTS `quotes`;
 DROP TABLE IF EXISTS `users`;
 
@@ -37,6 +38,20 @@ CREATE TABLE `quotes` (
   `image_path` VARCHAR(255) DEFAULT NULL,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `quote_likes` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT UNSIGNED NOT NULL,
+  `quote_id` INT UNSIGNED NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_quote_likes_user_quote` (`user_id`, `quote_id`),
+  KEY `idx_quote_likes_quote_id` (`quote_id`),
+  CONSTRAINT `fk_quote_likes_user`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_quote_likes_quote`
+    FOREIGN KEY (`quote_id`) REFERENCES `quotes` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `comments` (
@@ -100,3 +115,16 @@ INSERT INTO `comments` (`id`, `quote_id`, `user_id`, `parent_id`, `content`, `cr
 (15, 10, 2, 10, 'Second comment on this quote, deserved.', '2026-03-13 09:00:00'),
 (16, 1, 2, 2, 'And she meant every word of it.', '2026-03-14 08:00:00'),
 (17, 7, 3, 8, 'The ladder metaphor is still brilliant.', '2026-03-15 12:00:00');
+
+INSERT INTO `quote_likes` (`user_id`, `quote_id`, `created_at`) VALUES
+(2, 1, '2026-03-01 09:00:00'),
+(2, 7, '2026-03-06 12:00:00'),
+(2, 10, '2026-03-08 20:00:00'),
+(2, 4, '2026-03-04 16:00:00'),
+(3, 1, '2026-03-01 11:00:00'),
+(3, 5, '2026-03-05 19:30:00'),
+(3, 7, '2026-03-06 13:30:00'),
+(3, 10, '2026-03-08 21:00:00'),
+(3, 12, '2026-03-10 19:00:00'),
+(1, 4, '2026-03-04 17:00:00'),
+(1, 9, '2026-03-07 08:00:00');
