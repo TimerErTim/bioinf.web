@@ -5,8 +5,12 @@
 # @name forumLoginPage
 GET {{host}}/login
 
+{{
+  exports.csrf = response.body.match(/name="_csrf" value="([^"]+)"/)[1];
+}}
+
 ###
-@csrf := {{forumLoginPage.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+# @name forumLoginOk
 POST {{host}}/login
 Content-Type: application/x-www-form-urlencoded
 
@@ -16,8 +20,12 @@ username={{testUser}}&password={{testPassword}}&_csrf={{csrf}}
 # @name forumQuoteLike
 GET {{host}}/quotes/2
 
+{{
+  exports.likeCsrf = response.body.match(/name="csrf-token" content="([^"]+)"/)[1];
+}}
+
 ###
-@likeCsrf := {{forumQuoteLike.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @no-redirect
 # @name forumLike
 POST {{host}}/quotes/2/likes
 X-CSRF-Token: {{likeCsrf}}
@@ -28,8 +36,12 @@ X-CSRF-Token: {{likeCsrf}}
 # @name forumQuoteUnlike
 GET {{host}}/quotes/2
 
+{{
+  exports.unlikeCsrf = response.body.match(/name="csrf-token" content="([^"]+)"/)[1];
+}}
+
 ###
-@unlikeCsrf := {{forumQuoteUnlike.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @no-redirect
 # @name forumUnlike
 DELETE {{host}}/quotes/2/likes
 X-CSRF-Token: {{unlikeCsrf}}
@@ -40,8 +52,12 @@ X-CSRF-Token: {{unlikeCsrf}}
 # @name forumQuoteVote
 GET {{host}}/quotes/1
 
+{{
+  exports.voteCsrf = response.body.match(/name="csrf-token" content="([^"]+)"/)[1];
+}}
+
 ###
-@voteCsrf := {{forumQuoteVote.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @no-redirect
 # @name forumUpvote
 POST {{host}}/comments/3/votes
 Content-Type: application/x-www-form-urlencoded
@@ -55,8 +71,12 @@ vote=1
 # @name forumQuoteRemoveVote
 GET {{host}}/quotes/1
 
+{{
+  exports.removeVoteCsrf = response.body.match(/name="csrf-token" content="([^"]+)"/)[1];
+}}
+
 ###
-@removeVoteCsrf := {{forumQuoteRemoveVote.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @no-redirect
 # @name forumRemoveVote
 DELETE {{host}}/comments/3/votes
 X-CSRF-Token: {{removeVoteCsrf}}
@@ -64,6 +84,7 @@ X-CSRF-Token: {{removeVoteCsrf}}
 ?? status == 302
 
 ###
+# @no-redirect
 # @name forumDeleteNoCsrf
 DELETE {{host}}/comments/1
 
@@ -74,8 +95,12 @@ DELETE {{host}}/comments/1
 # @name forumHomeBadLike
 GET {{host}}/
 
+{{
+  exports.badLikeCsrf = response.body.match(/name="csrf-token" content="([^"]+)"/)[1];
+}}
+
 ###
-@badLikeCsrf := {{forumHomeBadLike.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @no-redirect
 # @name forumBadLike
 POST {{host}}/quotes/99999/likes
 X-CSRF-Token: {{badLikeCsrf}}

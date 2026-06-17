@@ -42,6 +42,7 @@ GET {{host}}/quotes/1?csort=top
 ?? status == 200
 
 ###
+# @no-redirect
 # @name pubAdminForbidden
 GET {{host}}/admin/users
 

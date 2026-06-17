@@ -74,7 +74,9 @@ final class AuthService
     // Only allow admin users to proceed; otherwise, show "forbidden"
     public static function requireAdmin(): void
     {
-        self::requireLogin();
+        if (!self::check()) {
+            Response::forbidden();
+        }
         if (!self::isAdmin()) {
             Response::forbidden();
         }

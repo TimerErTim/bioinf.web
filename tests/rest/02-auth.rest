@@ -12,8 +12,12 @@ GET {{host}}/login
 # @name authLoginPage
 GET {{host}}/login
 
+{{
+  exports.loginCsrf = response.body.match(/name="_csrf" value="([^"]+)"/)[1];
+}}
+
 ###
-@loginCsrf := {{authLoginPage.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+# @no-redirect
 # @name authLoginOk
 POST {{host}}/login
 Content-Type: application/x-www-form-urlencoded
@@ -30,8 +34,12 @@ GET {{host}}/
 ?? status == 200
 ?? body includes tyrion_fan
 
+{{
+  exports.homeCsrf = response.body.match(/name="csrf-token" content="([^"]+)"/)[1];
+}}
+
 ###
-@homeCsrf := {{authSessionCheck.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @no-redirect
 # @name authLogout
 POST {{host}}/logout
 X-CSRF-Token: {{homeCsrf}}
@@ -39,6 +47,7 @@ X-CSRF-Token: {{homeCsrf}}
 ?? status == 302
 
 ###
+# @no-redirect
 # @name authProfileRedirect
 GET {{host}}/profile
 
@@ -49,8 +58,11 @@ GET {{host}}/profile
 # @name authBadLoginPage
 GET {{host}}/login
 
+{{
+  exports.badCsrf = response.body.match(/name="_csrf" value="([^"]+)"/)[1];
+}}
+
 ###
-@badCsrf := {{authBadLoginPage.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
 # @name authLoginFail
 POST {{host}}/login
 Content-Type: application/x-www-form-urlencoded

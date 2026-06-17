@@ -174,28 +174,25 @@
       table.cell(fill: color.lighten(60%))[
         #testcase.attrs.at("classname", default: "—")
       ],
-      table.cell(fill: color.lighten(60%))[
+      table.cell()[
         #parsed.field #if parsed.op != "" { parsed.op } #parsed.expected
       ],
-      table.cell(fill: color.lighten(60%))[
-        #parsed.expected
-      ],
-      table.cell(fill: color.lighten(60%))[
+      table.cell()[
         #observed
       ],
-      table.cell(fill: color.lighten(60%))[
+      table.cell()[
         #text(fill: color, label)
       ],
     )
   }
 
   table(
-    columns: 5,
-    table.header(repeat: true)[*Request*][*Prüfung*][*Erwartet*][*Beobachtet*][*Status*],
+    columns: 4,
+    table.header(repeat: true)[*Request*][*Prüfung*][*Beobachtet*][*Status*],
     ..for (suite-name, cases) in data.suites.pairs() {
       (
         table.header(repeat: true, level: 2, table.cell(
-          colspan: 5,
+          colspan: 4,
         )[*#suite-name*]),
       )
       for testcase in cases {

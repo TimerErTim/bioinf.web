@@ -61,6 +61,7 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 if ($method === 'POST' && isset($_POST['_method'])) {
     $method = strtoupper((string) $_POST['_method']);
+    $_SERVER['REQUEST_METHOD'] = $method;
 }
 
 $uri = $_SERVER['REQUEST_URI'] ?? '/';

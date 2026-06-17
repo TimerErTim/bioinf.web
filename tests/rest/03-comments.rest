@@ -5,8 +5,12 @@
 # @name cmtLoginPage
 GET {{host}}/login
 
+{{
+  exports.csrf = response.body.match(/name="_csrf" value="([^"]+)"/)[1];
+}}
+
 ###
-@csrf := {{cmtLoginPage.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+# @name cmtLoginOk
 POST {{host}}/login
 Content-Type: application/x-www-form-urlencoded
 
@@ -16,8 +20,12 @@ username={{testUser}}&password={{testPassword}}&_csrf={{csrf}}
 # @name cmtHome
 GET {{host}}/
 
+{{
+  exports.postCsrf = response.body.match(/name="csrf-token" content="([^"]+)"/)[1];
+}}
+
 ###
-@postCsrf := {{cmtHome.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @no-redirect
 # @name cmtCreate
 POST {{host}}/quotes/2/comments
 Content-Type: application/x-www-form-urlencoded
@@ -35,6 +43,7 @@ GET {{host}}/quotes/2
 ?? body includes Automatisierter REST-Test
 
 ###
+# @no-redirect
 # @name cmtForbiddenEdit
 GET {{host}}/comments/12/edit
 
@@ -47,8 +56,12 @@ GET {{host}}/comments/1/edit
 ?? status == 200
 ?? body includes Kommentar bearbeiten
 
+{{
+  exports.editCsrf = response.body.match(/name="_csrf" value="([^"]+)"/)[1];
+}}
+
 ###
-@editCsrf := {{cmtEditForm.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+# @no-redirect
 # @name cmtUpdate
 POST {{host}}/comments/1
 Content-Type: application/x-www-form-urlencoded
@@ -62,14 +75,17 @@ _method=PUT&content=One+of+the+most+iconic+lines+(REST+updated)&_csrf={{editCsrf
 GET {{host}}/quotes/1
 
 ?? status == 200
-?? body includes REST+updated
+?? body includes REST updated
 
 ###
 # @name cmtQuotePage
 GET {{host}}/quotes/1
 
+{{
+  exports.emptyCsrf = response.body.match(/name="csrf-token" content="([^"]+)"/)[1];
+}}
+
 ###
-@emptyCsrf := {{cmtQuotePage.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
 # @name cmtEmptyRejected
 POST {{host}}/quotes/1/comments
 Content-Type: application/x-www-form-urlencoded

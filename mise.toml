@@ -1,5 +1,5 @@
 [tools]
-mysql = "latest"
+node = "lts"
 typst = "0.14.2"
 
 [vars]
@@ -27,6 +27,7 @@ MYSQL_DATABASE = "team_{{vars.team_nr}}"
 description = "Run automated REST tests (httpYac .rest files)"
 sources = ["public/**/*", "tests/rest/**/*", "scripts/run_rest_tests.sh"]
 outputs = ["doc/test-results/httpyac-junit.xml"]
+tools.node = "22"
 tools."npm:httpyac" = "6"
 run = '''
 #!/usr/bin/env bash
@@ -46,6 +47,7 @@ httpyac send "tests/rest/*.rest" --all -e dev \
 [tasks."run:db"]
 description = "Starts the local MySQL server"
 interactive = true
+tools.mysql = "8.0.33"
 file = "run_db.sh"
 
 [tasks.package-into-zip]
@@ -104,5 +106,6 @@ run = [
     "rm -f {{vars.zip_file}}",
     "mise run package-into-zip {{vars.zip_file}} public/",
     "mise run package-into-zip {{vars.zip_file}} -s doc/ WEB4_PHP_TEAM{{vars.team_nr}}.pdf",
-    "mise run package-into-zip {{vars.zip_file}} -s sql/ WEB4_PHP_TEAM{{vars.team_nr}}.sql"
+    "mise run package-into-zip {{vars.zip_file}} -s sql/ WEB4_PHP_TEAM{{vars.team_nr}}.sql",
+    "mise run package-into-zip {{vars.zip_file}} tests/rest/"
 ]

@@ -2,49 +2,59 @@
 @host = {{host}}
 
 ###
-# @name _adminLoginPage
+# @name admLoginPage
 GET {{host}}/login
 
+{{
+  exports.adminCsrf = response.body.match(/name="_csrf" value="([^"]+)"/)[1];
+}}
+
 ###
-@adminCsrf := {{_adminLoginPage.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+# @name admLoginOk
 POST {{host}}/login
 Content-Type: application/x-www-form-urlencoded
 
 username={{adminUser}}&password={{adminPassword}}&_csrf={{adminCsrf}}
 
 ###
-# @name T-ADM-01: Benutzerliste
+# @name admUserList
 GET {{host}}/admin/users
 
 ?? status == 200
 ?? body includes Benutzer
 
 ###
-# @name T-ADM-02: Zitat-Verwaltung
+# @name admQuoteList
 GET {{host}}/admin/quotes
 
 ?? status == 200
 ?? body includes Zitate
 
 ###
-# @name T-ADM-03: Neues Zitat Formular
+# @name admQuoteNewForm
 GET {{host}}/admin/quotes/new
 
 ?? status == 200
 ?? body includes Anlegen
 
 ###
-# @name T-ADM-04: Nicht-Admin blockiert
+# @name admUserLoginPage
 GET {{host}}/login
 
+{{
+  exports.userCsrf = response.body.match(/name="_csrf" value="([^"]+)"/)[1];
+}}
+
 ###
-@userCsrf := {{T-ADM-04: Nicht-Admin blockiert.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+# @name admUserLoginOk
 POST {{host}}/login
 Content-Type: application/x-www-form-urlencoded
 
 username={{testUser}}&password={{testPassword}}&_csrf={{userCsrf}}
 
 ###
+# @no-redirect
+# @name admUserForbidden
 GET {{host}}/admin/users
 
 ?? status == 403
