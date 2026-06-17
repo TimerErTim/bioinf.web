@@ -11,6 +11,7 @@ USE `team_7`;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS `comment_votes`;
 DROP TABLE IF EXISTS `comments`;
 DROP TABLE IF EXISTS `quote_likes`;
 DROP TABLE IF EXISTS `quotes`;
@@ -74,6 +75,22 @@ CREATE TABLE `comments` (
     FOREIGN KEY (`parent_id`) REFERENCES `comments` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `comment_votes` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT UNSIGNED DEFAULT NULL,
+  `comment_id` INT UNSIGNED NOT NULL,
+  `vote` TINYINT NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_comment_votes_user_comment` (`user_id`, `comment_id`),
+  KEY `idx_comment_votes_comment_id` (`comment_id`),
+  CONSTRAINT `fk_comment_votes_user`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_comment_votes_comment`
+    FOREIGN KEY (`comment_id`) REFERENCES `comments` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_comment_votes_value` CHECK (`vote` IN (1, -1))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Password: admin
 INSERT INTO `users` (`id`, `username`, `password_hash`, `is_admin`, `avatar_path`, `created_at`) VALUES
 (1, 'admin', '$2y$10$pMZjvrhbki/X9jkwsa.tweAK5SInkoG6RTMRT684JNMbR0m/IAne6', 1, NULL, '2026-01-15 10:00:00');
@@ -128,3 +145,17 @@ INSERT INTO `quote_likes` (`user_id`, `quote_id`, `created_at`) VALUES
 (3, 12, '2026-03-10 19:00:00'),
 (1, 4, '2026-03-04 17:00:00'),
 (1, 9, '2026-03-07 08:00:00');
+
+INSERT INTO `comment_votes` (`user_id`, `comment_id`, `vote`, `created_at`) VALUES
+(2, 1, 1, '2026-03-01 09:20:00'),
+(3, 1, 1, '2026-03-01 10:00:00'),
+(1, 1, 1, '2026-03-01 11:00:00'),
+(3, 2, 1, '2026-03-01 10:30:00'),
+(2, 7, 1, '2026-03-06 12:15:00'),
+(3, 7, 1, '2026-03-06 12:20:00'),
+(1, 7, 1, '2026-03-06 14:00:00'),
+(2, 8, 1, '2026-03-06 13:05:00'),
+(3, 10, 1, '2026-03-08 21:20:00'),
+(2, 10, 1, '2026-03-08 22:00:00'),
+(3, 5, -1, '2026-03-04 17:00:00'),
+(1, 10, -1, '2026-03-09 10:00:00');

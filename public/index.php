@@ -40,6 +40,8 @@ $router->delete('/profile/avatar', fn () => $profile->deleteAvatar());
 
 $router->post('/quotes/{quoteId}/comments', fn (string $quoteId) => $comments->store($quoteId));
 $router->post('/comments/{parentId}/replies', fn (string $parentId) => $comments->reply($parentId));
+$router->post('/comments/{id}/votes', fn (string $id) => $comments->setVote($id));
+$router->delete('/comments/{id}/votes', fn (string $id) => $comments->removeVote($id));
 $router->get('/comments/{id}/edit', fn (string $id) => $comments->edit($id));
 $router->put('/comments/{id}', fn (string $id) => $comments->update($id));
 $router->post('/comments/{id}', fn (string $id) => $comments->update($id));

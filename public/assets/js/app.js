@@ -77,4 +77,42 @@
             }
         });
     });
+
+    document.querySelectorAll('[data-comment-vote]').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const url = btn.dataset.commentVote;
+            const vote = btn.dataset.vote;
+            const isActive = btn.dataset.active === '1';
+
+            let res;
+            if (isActive) {
+                res = await fetch(url, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-Token': csrf, Accept: 'text/html' },
+                    redirect: 'follow',
+                });
+            } else {
+                res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-Token': csrf,
+                        Accept: 'text/html',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'vote=' + encodeURIComponent(vote),
+                    redirect: 'follow',
+                });
+            }
+
+            if (res.redirected) {
+                window.location.href = res.url;
+                return;
+            }
+
+            if (res.ok) {
+                window.location.reload();
+            }
+        });
+    });
 })();

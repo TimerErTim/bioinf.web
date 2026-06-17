@@ -18,24 +18,39 @@ final class Comment
         $this->db = $db;
     }
 
-    public function findByQuoteId(int $quoteId): array
+    /** @return list<array<string, mixed>> */
+    public function findByQuoteIdWithVotes(int $quoteId, ?int $viewerUserId = null): array
     {
+        $viewerId = $viewerUserId ?? 0;
+
         $stmt = $this->db->prepare(
-            'SELECT c.*, u.username, u.avatar_path
+            'SELECT c.*, u.username, u.avatar_path,
+                    (SELECT COALESCE(SUM(cv.vote), 0) FROM comment_votes cv WHERE cv.comment_id = c.id) AS score,
+                    (SELECT COUNT(*) FROM comment_votes cv WHERE cv.comment_id = c.id AND cv.vote = 1) AS upvotes,
+                    (SELECT COUNT(*) FROM comment_votes cv WHERE cv.comment_id = c.id AND cv.vote = -1) AS downvotes,
+                    (SELECT cv.vote FROM comment_votes cv
+                     WHERE cv.comment_id = c.id AND cv.user_id = :viewer_id LIMIT 1) AS user_vote,
+                    (
+                        (SELECT COUNT(*) FROM comment_votes cv2
+                         WHERE cv2.comment_id = c.id
+                           AND cv2.created_at >= NOW() - INTERVAL 7 DAY)
+                        + (SELECT COUNT(*) FROM comments ch
+                           WHERE ch.parent_id = c.id
+                             AND ch.created_at >= NOW() - INTERVAL 7 DAY)
+                    ) AS trend_score
              FROM comments c
              LEFT JOIN users u ON u.id = c.user_id
-             WHERE c.quote_id = :quote_id
-             ORDER BY c.created_at ASC',
+             WHERE c.quote_id = :quote_id',
         );
-        $stmt->execute(['quote_id' => $quoteId]);
+        $stmt->execute(['quote_id' => $quoteId, 'viewer_id' => $viewerId]);
 
         return $stmt->fetchAll();
     }
 
     /** @return list<array<string, mixed>> */
-    public function buildTree(int $quoteId): array
+    public function buildTree(int $quoteId, string $sort = 'new', ?int $viewerUserId = null): array
     {
-        return self::nestComments($this->findByQuoteId($quoteId));
+        return self::nestAndSort($this->findByQuoteIdWithVotes($quoteId, $viewerUserId), null, $sort);
     }
 
     public function countByQuoteId(int $quoteId): int
@@ -96,7 +111,10 @@ final class Comment
     public function findByUserId(int $userId, int $limit = 50): array
     {
         $stmt = $this->db->prepare(
-            'SELECT c.*, q.text AS quote_text, q.speaker AS quote_speaker
+            'SELECT c.*, q.text AS quote_text, q.speaker AS quote_speaker,
+                    (SELECT COALESCE(SUM(cv.vote), 0) FROM comment_votes cv WHERE cv.comment_id = c.id) AS score,
+                    (SELECT COUNT(*) FROM comment_votes cv WHERE cv.comment_id = c.id AND cv.vote = 1) AS upvotes,
+                    (SELECT COUNT(*) FROM comment_votes cv WHERE cv.comment_id = c.id AND cv.vote = -1) AS downvotes
              FROM comments c
              INNER JOIN quotes q ON q.id = c.quote_id
              WHERE c.user_id = :user_id
@@ -110,21 +128,66 @@ final class Comment
         return $stmt->fetchAll();
     }
 
+    public function totalScoreByUserId(int $userId): int
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COALESCE(SUM(cv.vote), 0)
+             FROM comment_votes cv
+             INNER JOIN comments c ON c.id = cv.comment_id
+             WHERE c.user_id = :user_id',
+        );
+        $stmt->execute(['user_id' => $userId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public static function normalizeSort(?string $sort): string
+    {
+        return match ($sort) {
+            'top', 'trending' => $sort,
+            default => 'new',
+        };
+    }
+
     /**
      * @param list<array<string, mixed>> $flat
      * @return list<array<string, mixed>>
      */
-    private static function nestComments(array $flat, ?int $parentId = null): array
+    private static function nestAndSort(array $flat, ?int $parentId, string $sort): array
     {
-        $branch = [];
+        $siblings = [];
         foreach ($flat as $comment) {
             $pid = $comment['parent_id'] !== null ? (int) $comment['parent_id'] : null;
             if ($pid === $parentId) {
-                $comment['children'] = self::nestComments($flat, (int) $comment['id']);
-                $branch[] = $comment;
+                $siblings[] = $comment;
             }
         }
 
-        return $branch;
+        $siblings = self::sortSiblings($siblings, $sort);
+
+        foreach ($siblings as &$comment) {
+            $comment['children'] = self::nestAndSort($flat, (int) $comment['id'], $sort);
+        }
+
+        return $siblings;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $siblings
+     * @return list<array<string, mixed>>
+     */
+    private static function sortSiblings(array $siblings, string $sort): array
+    {
+        usort($siblings, static function (array $a, array $b) use ($sort): int {
+            return match ($sort) {
+                'top' => ((int) $b['score'] <=> (int) $a['score'])
+                    ?: (strtotime((string) $b['created_at']) <=> strtotime((string) $a['created_at'])),
+                'trending' => ((int) $b['trend_score'] <=> (int) $a['trend_score'])
+                    ?: ((int) $b['score'] <=> (int) $a['score']),
+                default => strtotime((string) $b['created_at']) <=> strtotime((string) $a['created_at']),
+            };
+        });
+
+        return $siblings;
     }
 }

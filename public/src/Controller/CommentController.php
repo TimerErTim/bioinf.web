@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Database;
 use App\Flash;
 use App\Model\Comment;
+use App\Model\CommentVote;
 use App\Model\Quote;
 use App\Response;
 use App\Service\AuthService;
@@ -17,12 +18,14 @@ final class CommentController
 {
     private Quote $quotes;
     private Comment $comments;
+    private CommentVote $votes;
 
     public function __construct(array $config)
     {
         $pdo = Database::connection($config['db']);
         $this->quotes = new Quote($pdo);
         $this->comments = new Comment($pdo);
+        $this->votes = new CommentVote($pdo);
     }
 
     public function store(string $quoteId): void
@@ -52,6 +55,46 @@ final class CommentController
         }
 
         $this->saveComment((int) $parent['quote_id'], (int) $parent['id']);
+    }
+
+    public function setVote(string $id): void
+    {
+        Response::requirePost();
+        Response::requireCsrf();
+        AuthService::requireLogin();
+
+        $commentId = (int) $id;
+        $comment = $this->comments->findById($commentId);
+        if ($comment === null) {
+            Response::notFound();
+        }
+
+        $vote = (int) ($_POST['vote'] ?? 0);
+        if ($vote !== 1 && $vote !== -1) {
+            Flash::error('Ungültige Bewertung.');
+            $this->redirectBack('/quotes/' . $comment['quote_id']);
+        }
+
+        $this->votes->setVote(AuthService::userId(), $commentId, $vote);
+        Flash::success('Stimme gespeichert.');
+        $this->redirectBack('/quotes/' . $comment['quote_id']);
+    }
+
+    public function removeVote(string $id): void
+    {
+        Response::requireMethod(['DELETE']);
+        Response::requireCsrf();
+        AuthService::requireLogin();
+
+        $commentId = (int) $id;
+        $comment = $this->comments->findById($commentId);
+        if ($comment === null) {
+            Response::notFound();
+        }
+
+        $this->votes->removeVote(AuthService::userId(), $commentId);
+        Flash::success('Stimme entfernt.');
+        $this->redirectBack('/quotes/' . $comment['quote_id']);
     }
 
     public function edit(string $id): void
@@ -117,11 +160,12 @@ final class CommentController
 
     private function saveComment(int $quoteId, ?int $parentId): void
     {
-        $quote = $this->quotes->findById($quoteId);
+        $quote = $this->quotes->findById($quoteId, AuthService::userId());
         if ($quote === null) {
             Response::notFound();
         }
 
+        $commentSort = Comment::normalizeSort($_GET['csort'] ?? null);
         $content = trim($_POST['content'] ?? '');
         $errors = ValidationService::commentContent($content);
 
@@ -129,8 +173,9 @@ final class CommentController
             View::render('quotes/show', [
                 'title' => 'Zitat von ' . $quote['speaker'],
                 'quote' => $quote,
-                'commentTree' => $this->comments->buildTree($quoteId),
+                'commentTree' => $this->comments->buildTree($quoteId, $commentSort, AuthService::userId()),
                 'commentCount' => $this->comments->countByQuoteId($quoteId),
+                'commentSort' => $commentSort,
                 'commentErrors' => $errors,
                 'oldComment' => $content,
                 'replyToId' => $parentId,
@@ -155,5 +200,16 @@ final class CommentController
         }
 
         return $comment;
+    }
+
+    private function redirectBack(string $fallback): void
+    {
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        if (is_string($referer) && $referer !== '' && str_contains($referer, $_SERVER['HTTP_HOST'] ?? '')) {
+            header('Location: ' . $referer);
+            exit;
+        }
+
+        View::redirect($fallback);
     }
 }

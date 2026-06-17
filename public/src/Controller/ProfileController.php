@@ -57,6 +57,7 @@ final class ProfileController
             'title' => $user['username'],
             'user' => $user,
             'commentCount' => $this->users->countComments($userId),
+            'commentScore' => $this->comments->totalScoreByUserId($userId),
             'likeCount' => $this->likes->countByUserId($userId),
             'comments' => $this->comments->findByUserId($userId),
             'likedQuotes' => $this->enrichQuotesForViewer($this->likes->findQuotesByUserId($userId)),

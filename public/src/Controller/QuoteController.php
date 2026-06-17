@@ -58,11 +58,14 @@ final class QuoteController
             Response::notFound();
         }
 
+        $commentSort = Comment::normalizeSort($_GET['csort'] ?? null);
+
         View::render('quotes/show', [
             'title' => 'Zitat von ' . $quote['speaker'],
             'quote' => $quote,
-            'commentTree' => $this->comments->buildTree($quoteId),
+            'commentTree' => $this->comments->buildTree($quoteId, $commentSort, AuthService::userId()),
             'commentCount' => (int) $quote['comment_count'],
+            'commentSort' => $commentSort,
             'commentErrors' => [],
             'oldComment' => '',
             'replyToId' => null,

@@ -6,6 +6,7 @@ use App\Service\AuthService;
 
 require_once __DIR__ . '/avatar.php';
 require_once __DIR__ . '/delete-button.php';
+require_once __DIR__ . '/comment-vote.php';
 
 if (!function_exists('renderCommentAuthor')) {
     function renderCommentAuthor(array $comment): void
@@ -56,6 +57,7 @@ if (!function_exists('renderCommentTree')) {
                      class="relative border-l-2 border-stone-800 pl-4 py-4"
                      style="margin-left: <?= $indent ?>px">
                 <div class="flex gap-3">
+                    <?php renderCommentVote($comment); ?>
                     <?php renderAvatar($comment, 'md', true); ?>
                     <div class="flex-1 min-w-0">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-1">

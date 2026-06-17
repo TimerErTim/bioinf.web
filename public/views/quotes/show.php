@@ -14,6 +14,18 @@ require_once __DIR__ . '/../partials/like-button.php';
 /** @var list<string> $commentErrors */
 /** @var string $oldComment */
 /** @var int|null $replyToId */
+/** @var string $commentSort */
+
+$commentSorts = [
+    'new' => 'Neu',
+    'top' => 'Top',
+    'trending' => 'Trending',
+];
+
+function commentSortUrl(int $quoteId, string $sort): string
+{
+    return '/quotes/' . $quoteId . '?csort=' . urlencode($sort);
+}
 ?>
 <a href="/" class="inline-flex items-center gap-1 text-sm text-stone-500 hover:text-amber-400 transition-colors mb-6">← Zurück zum Feed</a>
 
@@ -47,10 +59,31 @@ require_once __DIR__ . '/../partials/like-button.php';
 </article>
 
 <section>
-    <h2 class="text-xl font-semibold text-stone-200 mb-6 flex items-center gap-2">
-        Diskussion
-        <span class="text-sm font-normal text-stone-500">(<?= (int) $commentCount ?>)</span>
-    </h2>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h2 class="text-xl font-semibold text-stone-200 flex items-center gap-2">
+            Diskussion
+            <span class="text-sm font-normal text-stone-500">(<?= (int) $commentCount ?>)</span>
+        </h2>
+        <?php if ($commentCount > 0): ?>
+            <nav class="flex flex-wrap gap-1 rounded-xl border border-stone-800 bg-stone-900/50 p-1" aria-label="Kommentar-Sortierung">
+                <?php foreach ($commentSorts as $key => $label): ?>
+                    <a href="<?= Html::e(commentSortUrl((int) $quote['id'], $key)) ?>"
+                       class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
+                              <?= $commentSort === $key
+                                  ? 'bg-amber-600 text-stone-950'
+                                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800' ?>">
+                        <?= Html::e($label) ?>
+                    </a>
+                <?php endforeach; ?>
+            </nav>
+        <?php endif; ?>
+    </div>
+
+    <?php if ($commentSort === 'top' && $commentCount > 0): ?>
+        <p class="mb-4 text-xs text-stone-500">Sortiert nach höchstem Score (Upvotes − Downvotes).</p>
+    <?php elseif ($commentSort === 'trending' && $commentCount > 0): ?>
+        <p class="mb-4 text-xs text-stone-500">Trending: Votes &amp; Antworten der letzten 7 Tage.</p>
+    <?php endif; ?>
 
     <?php if ($commentTree === []): ?>
         <div class="rounded-xl border border-dashed border-stone-700 px-6 py-10 text-center text-stone-500 mb-8">
