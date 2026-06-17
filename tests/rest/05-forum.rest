@@ -1,0 +1,83 @@
+# Likes, Votes, REST-Methoden
+@host = {{host}}
+
+###
+# @name forumLoginPage
+GET {{host}}/login
+
+###
+@csrf := {{forumLoginPage.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+POST {{host}}/login
+Content-Type: application/x-www-form-urlencoded
+
+username={{testUser}}&password={{testPassword}}&_csrf={{csrf}}
+
+###
+# @name forumQuoteLike
+GET {{host}}/quotes/2
+
+###
+@likeCsrf := {{forumQuoteLike.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @name forumLike
+POST {{host}}/quotes/2/likes
+X-CSRF-Token: {{likeCsrf}}
+
+?? status == 302
+
+###
+# @name forumQuoteUnlike
+GET {{host}}/quotes/2
+
+###
+@unlikeCsrf := {{forumQuoteUnlike.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @name forumUnlike
+DELETE {{host}}/quotes/2/likes
+X-CSRF-Token: {{unlikeCsrf}}
+
+?? status == 302
+
+###
+# @name forumQuoteVote
+GET {{host}}/quotes/1
+
+###
+@voteCsrf := {{forumQuoteVote.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @name forumUpvote
+POST {{host}}/comments/3/votes
+Content-Type: application/x-www-form-urlencoded
+X-CSRF-Token: {{voteCsrf}}
+
+vote=1
+
+?? status == 302
+
+###
+# @name forumQuoteRemoveVote
+GET {{host}}/quotes/1
+
+###
+@removeVoteCsrf := {{forumQuoteRemoveVote.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @name forumRemoveVote
+DELETE {{host}}/comments/3/votes
+X-CSRF-Token: {{removeVoteCsrf}}
+
+?? status == 302
+
+###
+# @name forumDeleteNoCsrf
+DELETE {{host}}/comments/1
+
+?? status == 302
+?? header location == /
+
+###
+# @name forumHomeBadLike
+GET {{host}}/
+
+###
+@badLikeCsrf := {{forumHomeBadLike.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @name forumBadLike
+POST {{host}}/quotes/99999/likes
+X-CSRF-Token: {{badLikeCsrf}}
+
+?? status == 404

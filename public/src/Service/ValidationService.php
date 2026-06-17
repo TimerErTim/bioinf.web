@@ -9,7 +9,7 @@ final class ValidationService
     public static function username(?string $username): array
     {
         $errors = [];
-        $username = trim((string) $username);
+        $username = trim((string) $username); // remove whitespace
 
         if ($username === '') {
             $errors[] = 'Benutzername ist Pflicht.';
@@ -80,10 +80,12 @@ final class ValidationService
 
     public static function optionalUint(?string $value, string $fieldLabel): array
     {
+        // Allow empty input and skip validation in that case
         if ($value === null || trim($value) === '') {
             return [];
         }
 
+        // Must be digits, from 1 to 255
         if (!ctype_digit(trim($value)) || (int) $value < 1 || (int) $value > 255) {
             return ["{$fieldLabel}: Zahl zwischen 1 und 255."];
         }

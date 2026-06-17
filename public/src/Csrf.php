@@ -10,6 +10,7 @@ final class Csrf
 
     public static function token(): string
     {
+        // Generate random token if not set in session
         if (empty($_SESSION[self::SESSION_KEY])) {
             $_SESSION[self::SESSION_KEY] = bin2hex(random_bytes(32));
         }
@@ -24,6 +25,7 @@ final class Csrf
 
     public static function validate(?string $token): bool
     {
+        // Mitigate timing attacks with hash_equals and check both presence and type
         $expected = $_SESSION[self::SESSION_KEY] ?? '';
 
         return is_string($token)

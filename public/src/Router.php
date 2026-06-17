@@ -36,6 +36,7 @@ final class Router
 
     public function dispatch(string $method, string $uri): void
     {
+        // Parse the path part of the URI and normalize it (strip trailing slash unless root)
         $path = parse_url($uri, PHP_URL_PATH) ?: '/';
         $path = rtrim($path, '/') ?: '/';
 
@@ -49,10 +50,12 @@ final class Router
                 continue;
             }
 
+            // Route matched: call handler with extracted params
             ($route['handler'])(...array_values($params));
             return;
         }
 
+        // No matching route found
         http_response_code(404);
         View::render('errors/404', ['title' => 'Nicht gefunden']);
     }
@@ -66,9 +69,16 @@ final class Router
         ];
     }
 
-    /** @return array<string, string>|null */
+    /** 
+     * Try to match route pattern (with simple `{param}` placeholders) to path.
+     * If matched, returns associative array of param => value.
+     * Returns null if not matched.
+     * 
+     * @return array<string, string>|null 
+     */
     private function match(string $pattern, string $path): ?array
     {
+        // Replace "{param}" in pattern with named subpattern
         $regex = preg_replace('#\{([a-zA-Z_]+)\}#', '(?P<$1>[^/]+)', $pattern);
         $regex = '#^' . $regex . '$#';
 
@@ -76,6 +86,7 @@ final class Router
             return null;
         }
 
+        // Only keep named capture groups
         $params = [];
         foreach ($matches as $key => $value) {
             if (is_string($key)) {

@@ -32,6 +32,8 @@ final class QuoteController
     public function index(): void
     {
         $sort = Quote::normalizeSort($_GET['sort'] ?? null);
+
+        // Validate and steer the current page within bounds
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $total = $this->quotes->countAll();
         $totalPages = max(1, (int) ceil($total / self::PAGE_SIZE));
@@ -52,6 +54,8 @@ final class QuoteController
     public function show(string $id): void
     {
         $quoteId = (int) $id;
+
+        // Fetch quote including viewer-specific data (could include user like)
         $quote = $this->quotes->findById($quoteId, AuthService::userId());
 
         if ($quote === null) {
@@ -60,6 +64,7 @@ final class QuoteController
 
         $commentSort = Comment::normalizeSort($_GET['csort'] ?? null);
 
+        // Build the nested comment tree. Might be expensive for large trees.
         View::render('quotes/show', [
             'title' => 'Zitat von ' . $quote['speaker'],
             'quote' => $quote,
@@ -79,6 +84,8 @@ final class QuoteController
         AuthService::requireLogin();
 
         $quoteId = (int) $id;
+
+        // Only allow liking existing quotes
         if ($this->quotes->findById($quoteId) === null) {
             Response::notFound();
         }
@@ -95,6 +102,8 @@ final class QuoteController
         AuthService::requireLogin();
 
         $quoteId = (int) $id;
+
+        // Only allow unliking existing quotes
         if ($this->quotes->findById($quoteId) === null) {
             Response::notFound();
         }

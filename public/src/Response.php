@@ -26,9 +26,13 @@ final class Response
         exit;
     }
 
-    /** @param list<string> $allowed */
+    /**
+     * Ensures the current request method is in the list of allowed methods.
+     * @param list<string> $allowed
+     */
     public static function requireMethod(array $allowed): void
     {
+        // Get the HTTP request method, default to GET if not set (can be ENV dependent)
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         if (!in_array($method, $allowed, true)) {
             self::methodNotAllowed();
@@ -40,8 +44,10 @@ final class Response
         self::requireMethod(['POST']);
     }
 
+    /** Validate CSRF token from form or AJAX header */
     public static function requireCsrf(): void
     {
+        // Get token from POST body or HTTP header. Ambiguous which user agent provided which; both are checked.
         $token = $_POST['_csrf'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
 
         if (!Csrf::validate(is_string($token) ? $token : null)) {
@@ -50,11 +56,16 @@ final class Response
         }
     }
 
+    /**
+     * Redirects back to the previous page if the referer is valid and same host;
+     * otherwise, uses provided fallback. This check reduces open redirect risk.
+     */
     public static function redirectBack(string $fallback): void
     {
         $referer = $_SERVER['HTTP_REFERER'] ?? '';
         $host = $_SERVER['HTTP_HOST'] ?? '';
 
+        // Only redirect to referer if it's present and matches this host
         if (is_string($referer) && $referer !== '' && $host !== '' && str_contains($referer, $host)) {
             header('Location: ' . $referer);
             exit;

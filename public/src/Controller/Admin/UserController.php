@@ -41,21 +41,25 @@ final class UserController
         $targetId = (int) $id;
         $target = $this->users->findById($targetId);
 
+        // Fail if user not found (could be a bad id or deleted user)
         if ($target === null) {
             Response::notFound();
         }
 
+        // Do not allow users to change their own admin status (prevents accidental lockout)
         if ($targetId === AuthService::userId()) {
             Flash::error('Eigene Admin-Rolle kannst du nicht ändern.');
             View::redirect('/admin/users');
         }
 
+        // If this is the last admin and they're being demoted, disallow
         $willDemote = (bool) $target['is_admin'];
         if ($willDemote && $this->users->countAdmins() <= 1) {
             Flash::error('Letzter Admin. Rolle kann nicht entzogen werden.');
             View::redirect('/admin/users');
         }
 
+        // Toggle is_admin status
         $this->users->setAdmin($targetId, !$willDemote);
         Flash::success('Rolle geändert.');
         View::redirect('/admin/users');
@@ -70,22 +74,29 @@ final class UserController
         $targetId = (int) $id;
         $target = $this->users->findById($targetId);
 
+        // Block if user not found (wrong/invalid id)
         if ($target === null) {
             Response::notFound();
         }
 
+        // Prevent admin from deleting themselves to avoid losing the last admin
         if ($targetId === AuthService::userId()) {
             Flash::error('Du kannst dich nicht selbst löschen.');
             View::redirect('/admin/users');
         }
 
+        // Edge case: block removing the last admin account completely
         if ((bool) $target['is_admin'] && $this->users->countAdmins() <= 1) {
             Flash::error('Letzter Admin kann nicht gelöscht werden.');
             View::redirect('/admin/users');
         }
 
+        // Delete the user's avatar file if present (no-op if null)
         UploadService::deleteFile($target['avatar_path'] ?? null);
+
+        // Actually remove the user record; related comments will render as "<deleted>"
         $this->users->delete($targetId);
+
         Flash::success('User gelöscht. Kommentare zeigen jetzt <deleted>.');
         View::redirect('/admin/users');
     }

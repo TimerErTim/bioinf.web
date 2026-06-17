@@ -44,6 +44,7 @@ final class User
 
     public function create(string $username, string $passwordHash, bool $isAdmin = false, ?string $avatarPath = null): int
     {
+        // Insert a new user record into the database
         $stmt = $this->db->prepare(
             'INSERT INTO users (username, password_hash, is_admin, avatar_path)
              VALUES (:username, :password_hash, :is_admin, :avatar_path)',
@@ -55,11 +56,13 @@ final class User
             'avatar_path' => $avatarPath,
         ]);
 
+        // Return the ID of the newly created user
         return (int) $this->db->lastInsertId();
     }
 
     public function updateAvatar(int $id, ?string $avatarPath): bool
     {
+        // Update the avatar_path field for a given user
         $stmt = $this->db->prepare('UPDATE users SET avatar_path = :avatar_path WHERE id = :id');
 
         return $stmt->execute(['id' => $id, 'avatar_path' => $avatarPath]);
@@ -84,6 +87,7 @@ final class User
 
     public function countAdmins(): int
     {
+        // Count the number of users who are admins
         $stmt = $this->db->query('SELECT COUNT(*) FROM users WHERE is_admin = 1');
 
         return (int) $stmt->fetchColumn();
@@ -91,6 +95,7 @@ final class User
 
     public function countComments(int $userId): int
     {
+        // Count the number of comments for a given user
         $stmt = $this->db->prepare('SELECT COUNT(*) FROM comments WHERE user_id = :user_id');
         $stmt->execute(['user_id' => $userId]);
 
@@ -99,6 +104,7 @@ final class User
 
     public function verifyPassword(array $user, string $password): bool
     {
+        // Verify a plain password against the password hash stored in the user record
         return password_verify($password, $user['password_hash']);
     }
 }

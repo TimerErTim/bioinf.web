@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
+// Load main config
 $config = require __DIR__ . '/config.php';
 
+// Merge in local overrides if available
 $localConfig = __DIR__ . '/config.local.php';
 if (is_file($localConfig)) {
     $config = array_replace_recursive($config, require $localConfig);
 }
 
+// Register autoloader (for classes in App\)
 spl_autoload_register(static function (string $class): void {
     $prefix = 'App\\';
     if (!str_starts_with($class, $prefix)) {
@@ -22,6 +25,7 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

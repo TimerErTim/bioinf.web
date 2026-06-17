@@ -1,0 +1,48 @@
+# Öffentliche Endpunkte (Gast)
+@host = {{host}}
+
+###
+# @name pubFeed
+GET {{host}}/
+
+?? status == 200
+?? body includes Zitate
+
+###
+# @name pubQuoteDetail
+GET {{host}}/quotes/1
+
+?? status == 200
+?? body includes Cersei Lannister
+
+###
+# @name pubQuote404
+GET {{host}}/quotes/99999
+
+?? status == 404
+
+###
+# @name pubProfile
+GET {{host}}/users/2
+
+?? status == 200
+?? body includes tyrion_fan
+
+###
+# @name pubSortTop
+GET {{host}}/?sort=top
+
+?? status == 200
+?? body includes sort=top
+
+###
+# @name pubCommentSort
+GET {{host}}/quotes/1?csort=top
+
+?? status == 200
+
+###
+# @name pubAdminForbidden
+GET {{host}}/admin/users
+
+?? status == 403

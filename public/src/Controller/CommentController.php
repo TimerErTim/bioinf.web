@@ -70,6 +70,7 @@ final class CommentController
         }
 
         $vote = (int) ($_POST['vote'] ?? 0);
+        // Only allow values +1 or -1 as votes
         if ($vote !== 1 && $vote !== -1) {
             Flash::error('Ungültige Bewertung.');
             Response::redirectBack('/quotes/' . $comment['quote_id']);
@@ -101,6 +102,7 @@ final class CommentController
     {
         AuthService::requireLogin();
 
+        // Only allow editing of user's own comment, or fail with 403
         $comment = $this->loadOwnedComment((int) $id);
         View::render('comments/edit', [
             'title' => 'Kommentar bearbeiten',
@@ -115,6 +117,7 @@ final class CommentController
         Response::requireCsrf();
         AuthService::requireLogin();
 
+        // Only allow user's own comment to be updated
         $comment = $this->loadOwnedComment((int) $id);
         $content = trim($_POST['content'] ?? '');
         $errors = ValidationService::commentContent($content);
@@ -139,6 +142,7 @@ final class CommentController
         Response::requireCsrf();
         AuthService::requireLogin();
 
+        // Fetch the comment to be deleted, needed for authorization and redirect
         $comment = $this->comments->findById((int) $id);
         if ($comment === null) {
             Response::notFound();
@@ -148,6 +152,7 @@ final class CommentController
         $isOwner = $comment['user_id'] !== null && (int) $comment['user_id'] === $userId;
         $isAdmin = AuthService::isAdmin();
 
+        // Only the owner or admin may delete the comment
         if (!$isOwner && !$isAdmin) {
             Response::forbidden();
         }
@@ -160,6 +165,7 @@ final class CommentController
 
     private function saveComment(int $quoteId, ?int $parentId): void
     {
+        // Get quote with viewer context for error display; abort if not found
         $quote = $this->quotes->findById($quoteId, AuthService::userId());
         if ($quote === null) {
             Response::notFound();
@@ -169,6 +175,7 @@ final class CommentController
         $content = trim($_POST['content'] ?? '');
         $errors = ValidationService::commentContent($content);
 
+        // On validation errors, re-render form preserving entered content and errors
         if ($errors !== []) {
             View::render('quotes/show', [
                 'title' => 'Zitat von ' . $quote['speaker'],
@@ -183,6 +190,7 @@ final class CommentController
             return;
         }
 
+        // Persist comment (new or reply)
         $this->comments->create($quoteId, AuthService::userId(), $content, $parentId);
         Flash::success($parentId === null ? 'Kommentar gespeichert.' : 'Antwort gespeichert.');
         View::redirect('/quotes/' . $quoteId . ($parentId !== null ? '#comment-' . $parentId : ''));
@@ -195,6 +203,7 @@ final class CommentController
             Response::notFound();
         }
 
+        // Only allow access if logged-in user owns the comment
         if ($comment['user_id'] === null || (int) $comment['user_id'] !== AuthService::userId()) {
             Response::forbidden();
         }

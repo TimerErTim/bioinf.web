@@ -19,6 +19,7 @@ final class QuoteController
 
     public function __construct(array $config)
     {
+        // Initialize Quote model with DB connection from config
         $this->quotes = new Quote(Database::connection($config['db']));
     }
 
@@ -49,6 +50,7 @@ final class QuoteController
         Response::requireCsrf();
         AuthService::requireAdmin();
 
+        // Handles creation of a new quote (quoteId null means create mode)
         $this->handleSave(null);
     }
 
@@ -75,6 +77,7 @@ final class QuoteController
         Response::requireCsrf();
         AuthService::requireAdmin();
 
+        // Handles update of an existing quote
         $this->handleSave((int) $id);
     }
 
@@ -90,27 +93,36 @@ final class QuoteController
             Response::notFound();
         }
 
+        // Delete associated image, if any. No-op if image_path is null
         UploadService::deleteFile($quote['image_path'] ?? null);
         $this->quotes->delete($quoteId);
         Flash::success('Zitat gelöscht.');
         View::redirect('/admin/quotes');
     }
 
+    /**
+     * Handle create or update of a quote.
+     * If $quoteId is null, create; if int, update.
+     */
     private function handleSave(?int $quoteId): void
     {
+        // If updating, get current quote and fail if not found
         $existing = $quoteId !== null ? $this->quotes->findById($quoteId) : null;
         if ($quoteId !== null && $existing === null) {
             Response::notFound();
         }
 
+        // Form input: build $data array, fallback to existing image if present
         $data = [
             'text' => trim($_POST['text'] ?? ''),
             'speaker' => trim($_POST['speaker'] ?? ''),
             'season' => trim($_POST['season'] ?? '') !== '' ? (int) $_POST['season'] : null,
             'episode' => trim($_POST['episode'] ?? '') !== '' ? (int) $_POST['episode'] : null,
+            // For updates, prefill value from existing
             'image_path' => $existing['image_path'] ?? null,
         ];
 
+        // Aggregate all validation errors
         $errors = array_merge(
             ValidationService::quoteText($data['text']),
             ValidationService::speaker($data['speaker']),
@@ -118,10 +130,12 @@ final class QuoteController
             ValidationService::optionalUint($_POST['episode'] ?? null, 'Episode'),
         );
 
+        // File upload handling: only proceed if an image file is uploaded
         if (isset($_FILES['image'])) {
             $upload = UploadService::storeImage($_FILES['image'], 'quotes');
             $errors = array_merge($errors, $upload['errors']);
             if ($upload['path'] !== null) {
+                // If updating and old image exists, remove from server
                 if ($existing !== null && !empty($existing['image_path'])) {
                     UploadService::deleteFile($existing['image_path']);
                 }
@@ -129,14 +143,17 @@ final class QuoteController
             }
         }
 
+        // Image removal requested: user asked to remove existing image
         if (!empty($_POST['remove_image']) && $existing !== null) {
             UploadService::deleteFile($existing['image_path'] ?? null);
             $data['image_path'] = null;
         }
 
+        // Choose view and title based on create/update mode
         $view = $quoteId === null ? 'admin/quotes/create' : 'admin/quotes/edit';
         $title = $quoteId === null ? 'Neues Zitat' : 'Zitat bearbeiten';
 
+        // If there are validation or upload errors, re-render the form
         if ($errors !== []) {
             View::render($view, [
                 'title' => $title,
@@ -146,6 +163,7 @@ final class QuoteController
             return;
         }
 
+        // Commit the create or update, depending on whether it's a new quote or editing
         if ($quoteId === null) {
             $this->quotes->create($data);
             Flash::success('Zitat angelegt.');
@@ -157,6 +175,9 @@ final class QuoteController
         View::redirect('/admin/quotes');
     }
 
+    /**
+     * Returns an empty quote structure for new quote form.
+     */
     private function emptyQuote(): array
     {
         return [

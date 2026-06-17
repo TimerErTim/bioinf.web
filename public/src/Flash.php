@@ -27,6 +27,7 @@ final class Flash
 
     public static function consume(): array
     {
+        // Retrieve and remove all flash messages from session at once
         $messages = $_SESSION[self::SESSION_KEY] ?? [];
         unset($_SESSION[self::SESSION_KEY]);
 
@@ -35,6 +36,7 @@ final class Flash
 
     private static function push(string $type, string $message): void
     {
+        // Lazily initialize the session array for flash messages if not present
         $_SESSION[self::SESSION_KEY] ??= [];
         $_SESSION[self::SESSION_KEY][] = ['type' => $type, 'message' => $message];
     }

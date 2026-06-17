@@ -1,0 +1,61 @@
+# Authentifizierung
+@host = {{host}}
+
+###
+# @name authLoginForm
+GET {{host}}/login
+
+?? status == 200
+?? body includes Einloggen
+
+###
+# @name authLoginPage
+GET {{host}}/login
+
+###
+@loginCsrf := {{authLoginPage.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+# @name authLoginOk
+POST {{host}}/login
+Content-Type: application/x-www-form-urlencoded
+
+username={{testUser}}&password={{testPassword}}&_csrf={{loginCsrf}}
+
+?? status == 302
+?? header location == /
+
+###
+# @name authSessionCheck
+GET {{host}}/
+
+?? status == 200
+?? body includes tyrion_fan
+
+###
+@homeCsrf := {{authSessionCheck.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @name authLogout
+POST {{host}}/logout
+X-CSRF-Token: {{homeCsrf}}
+
+?? status == 302
+
+###
+# @name authProfileRedirect
+GET {{host}}/profile
+
+?? status == 302
+?? header location == /login
+
+###
+# @name authBadLoginPage
+GET {{host}}/login
+
+###
+@badCsrf := {{authBadLoginPage.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+# @name authLoginFail
+POST {{host}}/login
+Content-Type: application/x-www-form-urlencoded
+
+username={{testUser}}&password=wrongpassword&_csrf={{badCsrf}}
+
+?? status == 200
+?? body includes ungültig

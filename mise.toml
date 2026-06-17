@@ -4,10 +4,12 @@ typst = "0.14.2"
 
 [vars]
 team_nr = "7"
+app_host = "127.0.0.1"
+app_port = "80"
 
 [env]
 TYPST_ROOT = "{{config_root}}"
-TYPST_FONT_PATH = "{{config_root}}/doc/fonts"
+TYPST_FONT_PATHS = "{{config_root}}/doc/fonts"
 
 # Define repository-relative paths
 MYSQL_REPO_ROOT = "{{config_root}}"
@@ -21,6 +23,25 @@ MYSQL_USER = "fh_webphp"
 MYSQL_PASSWORD = "fh_webphp"
 MYSQL_DATABASE = "team_{{vars.team_nr}}"
 
+[tasks."test:rest"]
+description = "Run automated REST tests (httpYac .rest files)"
+sources = ["public/**/*", "tests/rest/**/*", "scripts/run_rest_tests.sh"]
+outputs = ["doc/test-results/httpyac-junit.xml"]
+tools."npm:httpyac" = "6"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+
+BASE_URL="http://{{vars.app_host}}:{{vars.app_port}}"
+if ! curl -sf "${BASE_URL}/" >/dev/null 2>&1; then
+  echo "App not reachable at ${BASE_URL}." >&2
+  exit 1
+fi
+
+httpyac send "tests/rest/*.rest" --all -e dev \
+  --var "host=${BASE_URL}" \
+  --junit > "doc/test-results/httpyac-junit.xml"
+'''
 
 [tasks."run:db"]
 description = "Starts the local MySQL server"

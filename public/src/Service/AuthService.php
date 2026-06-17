@@ -10,6 +10,7 @@ use App\View;
 
 final class AuthService
 {
+    // Stores user information in session and regenerates session ID
     public static function login(int $userId, string $username, bool $isAdmin, ?string $avatarPath = null): void
     {
         session_regenerate_id(true);
@@ -25,6 +26,7 @@ final class AuthService
         session_regenerate_id(true);
     }
 
+    // Update the avatar path in session if user is logged in
     public static function refreshAvatar(?string $avatarPath): void
     {
         if (self::check()) {
@@ -47,6 +49,7 @@ final class AuthService
         return $_SESSION['username'] ?? null;
     }
 
+    // Return avatar path if set and not empty, otherwise null
     public static function avatarPath(): ?string
     {
         $path = $_SESSION['avatar_path'] ?? null;
@@ -59,6 +62,7 @@ final class AuthService
         return !empty($_SESSION['is_admin']);
     }
 
+    // Redirects unauthenticated users to login with error message
     public static function requireLogin(): void
     {
         if (!self::check()) {
@@ -67,6 +71,7 @@ final class AuthService
         }
     }
 
+    // Only allow admin users to proceed; otherwise, show "forbidden"
     public static function requireAdmin(): void
     {
         self::requireLogin();

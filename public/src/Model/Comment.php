@@ -20,6 +20,8 @@ final class Comment
     {
         $viewerId = $viewerUserId ?? 0;
 
+        // Fetch the comments for a quote, joined with user info.
+        // Also computes various voting metrics and the viewing user's vote, and the "trend score".
         $stmt = $this->db->prepare(
             'SELECT c.*, u.username, u.avatar_path,
                     (SELECT COALESCE(SUM(cv.vote), 0) FROM comment_votes cv WHERE cv.comment_id = c.id) AS score,
@@ -47,6 +49,7 @@ final class Comment
     /** @return list<array<string, mixed>> */
     public function buildTree(int $quoteId, string $sort = 'new', ?int $viewerUserId = null): array
     {
+        // Build a nested comment/reply tree with sorting
         return self::nestAndSort($this->findByQuoteIdWithVotes($quoteId, $viewerUserId), null, $sort);
     }
 
@@ -60,6 +63,7 @@ final class Comment
 
     public function findById(int $id): ?array
     {
+        // Look up a comment by ID, with the comment's user info joined
         $stmt = $this->db->prepare(
             'SELECT c.*, u.username, u.avatar_path
              FROM comments c
@@ -90,6 +94,7 @@ final class Comment
 
     public function update(int $id, string $content): bool
     {
+        // Only updates content and timestamp; doesn't modify anything else
         $stmt = $this->db->prepare(
             'UPDATE comments SET content = :content, updated_at = NOW() WHERE id = :id',
         );
@@ -107,6 +112,7 @@ final class Comment
     /** @return list<array<string, mixed>> */
     public function findByUserId(int $userId, int $limit = 50): array
     {
+        // Fetch a user's comments (with quote info and voting stats for each comment)
         $stmt = $this->db->prepare(
             'SELECT c.*, q.text AS quote_text, q.speaker AS quote_speaker,
                     (SELECT COALESCE(SUM(cv.vote), 0) FROM comment_votes cv WHERE cv.comment_id = c.id) AS score,
@@ -127,6 +133,7 @@ final class Comment
 
     public function totalScoreByUserId(int $userId): int
     {
+        // Aggregate total vote score across all comments by the user
         $stmt = $this->db->prepare(
             'SELECT COALESCE(SUM(cv.vote), 0)
              FROM comment_votes cv
@@ -140,6 +147,7 @@ final class Comment
 
     public static function normalizeSort(?string $sort): string
     {
+        // Only allow 'top', 'trending' or default to 'new'
         return match ($sort) {
             'top', 'trending' => $sort,
             default => 'new',
@@ -152,6 +160,7 @@ final class Comment
      */
     private static function nestAndSort(array $flat, ?int $parentId, string $sort): array
     {
+        // This function recursively builds a nested tree from a flat array using parent_id
         $siblings = [];
         foreach ($flat as $comment) {
             $pid = $comment['parent_id'] !== null ? (int) $comment['parent_id'] : null;
@@ -162,6 +171,7 @@ final class Comment
 
         $siblings = self::sortSiblings($siblings, $sort);
 
+        // For each sibling, recursively build its children array
         foreach ($siblings as &$comment) {
             $comment['children'] = self::nestAndSort($flat, (int) $comment['id'], $sort);
         }
@@ -175,6 +185,7 @@ final class Comment
      */
     private static function sortSiblings(array $siblings, string $sort): array
     {
+        // Sorting siblings in-place according to chosen strategy: top/trending/newest
         usort($siblings, static function (array $a, array $b) use ($sort): int {
             return match ($sort) {
                 'top' => ((int) $b['score'] <=> (int) $a['score'])

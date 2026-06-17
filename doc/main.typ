@@ -2,6 +2,7 @@
 #import "libs.typ": *
 #import "template.typ": documentation-template
 #import "visualization/test_results.typ": table-test-results-overview, table-test-results-detailed
+#import "visualization/httpyac_test_results.typ": parse-httpyac-junit, table-httpyac-overview, table-httpyac-detailed
 
 #set document(
   author: ("Nathalie Sonnleitner", "Tim Peko"),
@@ -274,7 +275,43 @@ public/
 
 = Testfälle
 
-Alle Tests wurden manuell in Google Chrome unter XAMPP durchgeführt.
+Die REST-Schnittstelle wird automatisiert mit *httpYac* getestet. httpYac ist ein CLI-Runner für `.rest`-Dateien (kompatibel mit IntelliJ HTTP Client / VS Code REST Client). Jede Anfrage enthält Assertions (`?? status == 200`, `?? body includes …`), die Statuscode und Response-Body prüfen.
+
+== Test-Runner
+
+#table(
+  columns: (1.2fr, 2.8fr),
+  table.header[*Tool*][*Verwendung*],
+  [httpYac CLI], [`npm install -g httpyac` oder via `mise install`],
+  [Tests ausführen], [`mise run test:rest`],
+  [JUnit-Report], [`doc/test-results/httpyac-junit.xml`],
+  [Testdateien], [`tests/rest/*.rest`],
+)
+
+Voraussetzungen: PHP-Server und MySQL laufen bereits (z. B. `mise run run:app` und `mise run run:db`), SQL-Dump `WEB4_PHP_TEAM7.sql` importiert. Standard-URL: `http://127.0.0.1:8080`.
+
+== Automatisierte REST-Tests (httpYac)
+
+#let rest-junit-path = "../test-results/httpyac-junit.xml"
+#let rest-data = parse-httpyac-junit(rest-junit-path)
+
+#if rest-data != none [
+  Die folgenden Tabellen wurden aus dem JUnit-Report generiert. Spalte *Erwartet* stammt aus der Assertion in der `.rest`-Datei; *Beobachtet* ist der tatsächliche Wert (bei Fehlern aus der httpYac-Fehlermeldung).
+
+  === Übersicht
+
+  #table-httpyac-overview(rest-data)
+
+  === Erwartete und beobachtete Werte
+
+  #table-httpyac-detailed(rest-data)
+] else [
+  _Kein JUnit-Report gefunden._ Ausführen mit: `mise run test:rest`
+]
+
+== Manuelle UI-Tests
+
+Zusätzlich wurden folgende Szenarien manuell in Google Chrome geprüft (Uploads, responsives Layout, Thread-Darstellung):
 
 #let test-data = (
   tests: 32,

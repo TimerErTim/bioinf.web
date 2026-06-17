@@ -48,6 +48,7 @@ final class AuthController
         $password = $_POST['password'] ?? '';
         $passwordConfirm = $_POST['password_confirm'] ?? '';
 
+        // Aggregate validation errors for username and password
         $errors = ValidationService::username($username);
         $errors = array_merge($errors, ValidationService::password($password));
 
@@ -57,16 +58,19 @@ final class AuthController
 
         $avatarPath = null;
         if (isset($_FILES['avatar'])) {
+            // Avatar upload returns errors and file path in an array
             $upload = UploadService::storeImage($_FILES['avatar'], 'avatars');
             $errors = array_merge($errors, $upload['errors']);
             $avatarPath = $upload['path'];
         }
 
+        // The following check is necessary to avoid race conditions for username uniqueness
         if ($errors === [] && $this->users->findByUsername($username) !== null) {
             $errors[] = 'Benutzername ist schon vergeben.';
         }
 
         if ($errors !== []) {
+            // Clean up uploaded avatar file if validation fails
             if ($avatarPath !== null) {
                 UploadService::deleteFile($avatarPath);
             }
@@ -105,6 +109,7 @@ final class AuthController
         $password = $_POST['password'] ?? '';
 
         $user = $this->users->findByUsername($username);
+        // Only valid user/password combinations allowed; otherwise, fail without revealing specifics
         if ($user === null || !$this->users->verifyPassword($user, $password)) {
             View::render('auth/login', [
                 'title' => 'Login',

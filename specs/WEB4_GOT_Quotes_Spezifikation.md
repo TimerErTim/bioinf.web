@@ -474,13 +474,30 @@ Quelle: [`doc/main.typ`](../doc/main.typ) — ER-Diagramm, REST-Routing, Sicherh
 
 ---
 
-## 12. Testfälle (Erweiterter Katalog)
+## 12. Testfälle
 
-### 12.1 Bestehende Tests
+### 12.1 Automatisierte REST-Tests (httpYac)
 
-T-AUTH-01 … T-SEC-03 bleiben gültig (Routen ggf. anpassen).
+Tests liegen in `tests/rest/*.rest` und werden mit dem CLI-Tool [httpYac](https://httpyac.github.io/) ausgeführt:
 
-### 12.2 Neue / geänderte Tests
+```bash
+mise run test:rest          # JUnit → doc/test-results/httpyac-junit.xml
+mise run build:full         # Tests + PDF mit Ergebnistabellen
+```
+
+Jede Anfrage dokumentiert erwartete Statuscodes und Body-Inhalte via Assertions (`?? status == 200`, `?? body includes …`). Die Typst-Doku liest den JUnit-Report und zeigt *Erwartet* vs. *Beobachtet* automatisch an.
+
+| Datei | Inhalt |
+|---|---|
+| `01-public.rest` | Gast-Zugriff, 404, 403 |
+| `02-auth.rest` | Login, Logout, Session |
+| `03-comments.rest` | CRUD, Validierung, IDOR |
+| `04-admin.rest` | Admin-Bereich, Berechtigungen |
+| `05-forum.rest` | Likes, Votes, CSRF, REST-Methoden |
+
+### 12.2 Manuelle UI-Tests
+
+T-AUTH-01 … T-SEC-03 und UI-Szenarien (Uploads, responsives Layout) bleiben gültig.
 
 | ID | Szenario |
 |---|---|

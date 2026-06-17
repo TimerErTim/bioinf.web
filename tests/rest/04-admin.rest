@@ -1,0 +1,50 @@
+# Administration (Admin)
+@host = {{host}}
+
+###
+# @name _adminLoginPage
+GET {{host}}/login
+
+###
+@adminCsrf := {{_adminLoginPage.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+POST {{host}}/login
+Content-Type: application/x-www-form-urlencoded
+
+username={{adminUser}}&password={{adminPassword}}&_csrf={{adminCsrf}}
+
+###
+# @name T-ADM-01: Benutzerliste
+GET {{host}}/admin/users
+
+?? status == 200
+?? body includes Benutzer
+
+###
+# @name T-ADM-02: Zitat-Verwaltung
+GET {{host}}/admin/quotes
+
+?? status == 200
+?? body includes Zitate
+
+###
+# @name T-ADM-03: Neues Zitat Formular
+GET {{host}}/admin/quotes/new
+
+?? status == 200
+?? body includes Anlegen
+
+###
+# @name T-ADM-04: Nicht-Admin blockiert
+GET {{host}}/login
+
+###
+@userCsrf := {{T-ADM-04: Nicht-Admin blockiert.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+POST {{host}}/login
+Content-Type: application/x-www-form-urlencoded
+
+username={{testUser}}&password={{testPassword}}&_csrf={{userCsrf}}
+
+###
+GET {{host}}/admin/users
+
+?? status == 403

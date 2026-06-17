@@ -18,13 +18,19 @@ final class Quote
     /** @return list<array<string, mixed>> */
     public function findAll(int $limit, int $offset, string $sort = 'new', ?int $viewerUserId = null): array
     {
+        // Resolve the viewer ID, defaulting to 0 if not provided
         $viewerId = $viewerUserId ?? 0;
+
+        // Determine the ORDER BY clause based on the sort parameter
         $orderBy = match ($sort) {
             'top' => 'like_count DESC, q.created_at DESC',
             'trending' => 'trend_score DESC, q.created_at DESC',
             default => 'q.created_at DESC',
         };
 
+        // The query fetches quotes and metadata (comment/like/trend counts, user_liked)
+        // The stats subquery aggregates comment/like/trend data for each quote
+        // The LEFT JOIN on quote_likes finds if the viewer has liked each quote
         $sql = "SELECT q.*,
                    stats.comment_count,
                    stats.like_count,
@@ -62,6 +68,8 @@ final class Quote
     {
         $viewerId = $viewerUserId ?? 0;
 
+        // Aggregates detailed information and metrics for a single quote,
+        // including counts and whether the viewer has liked it
         $stmt = $this->db->prepare(
             'SELECT q.*,
                     stats.comment_count,
@@ -143,6 +151,7 @@ final class Quote
 
     public static function normalizeSort(?string $sort): string
     {
+        // Only allow certain sort values
         return match ($sort) {
             'top', 'trending' => $sort,
             default => 'new',

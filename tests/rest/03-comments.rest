@@ -1,0 +1,81 @@
+# Kommentare (User tyrion_fan)
+@host = {{host}}
+
+###
+# @name cmtLoginPage
+GET {{host}}/login
+
+###
+@csrf := {{cmtLoginPage.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+POST {{host}}/login
+Content-Type: application/x-www-form-urlencoded
+
+username={{testUser}}&password={{testPassword}}&_csrf={{csrf}}
+
+###
+# @name cmtHome
+GET {{host}}/
+
+###
+@postCsrf := {{cmtHome.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @name cmtCreate
+POST {{host}}/quotes/2/comments
+Content-Type: application/x-www-form-urlencoded
+X-CSRF-Token: {{postCsrf}}
+
+content=Automatisierter+REST-Test+{{$timestamp}}
+
+?? status == 302
+
+###
+# @name cmtShow
+GET {{host}}/quotes/2
+
+?? status == 200
+?? body includes Automatisierter REST-Test
+
+###
+# @name cmtForbiddenEdit
+GET {{host}}/comments/12/edit
+
+?? status == 403
+
+###
+# @name cmtEditForm
+GET {{host}}/comments/1/edit
+
+?? status == 200
+?? body includes Kommentar bearbeiten
+
+###
+@editCsrf := {{cmtEditForm.body.match(/name="_csrf" value="([^"]+)"/)[1]}}
+# @name cmtUpdate
+POST {{host}}/comments/1
+Content-Type: application/x-www-form-urlencoded
+
+_method=PUT&content=One+of+the+most+iconic+lines+(REST+updated)&_csrf={{editCsrf}}
+
+?? status == 302
+
+###
+# @name cmtUpdated
+GET {{host}}/quotes/1
+
+?? status == 200
+?? body includes REST+updated
+
+###
+# @name cmtQuotePage
+GET {{host}}/quotes/1
+
+###
+@emptyCsrf := {{cmtQuotePage.body.match(/name="csrf-token" content="([^"]+)"/)[1]}}
+# @name cmtEmptyRejected
+POST {{host}}/quotes/1/comments
+Content-Type: application/x-www-form-urlencoded
+X-CSRF-Token: {{emptyCsrf}}
+
+content=
+
+?? status == 200
+?? body includes darf nicht leer
