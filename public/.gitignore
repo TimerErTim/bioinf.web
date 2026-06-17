@@ -1,1 +1,5 @@
 config.local.php
+/uploads/*
+!/uploads/.htaccess
+!/uploads/quotes/.gitkeep
+!/uploads/avatars/.gitkeep

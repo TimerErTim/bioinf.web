@@ -6,7 +6,6 @@ namespace App\Model;
 
 use PDO;
 
-// Quote table access. See User.php for the prepare/execute pattern.
 final class Quote
 {
     private PDO $db;
@@ -26,10 +25,6 @@ final class Quote
              ORDER BY q.created_at DESC
              LIMIT :limit OFFSET :offset',
         );
-        /*
-         * LIMIT values must be integers. bindValue(..., PDO::PARAM_INT) tells PDO
-         * they are numbers, not strings (MySQL rejects LIMIT "20" in some setups).
-         */
         $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -54,14 +49,15 @@ final class Quote
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO quotes (text, speaker, season, episode)
-             VALUES (:text, :speaker, :season, :episode)',
+            'INSERT INTO quotes (text, speaker, season, episode, image_path)
+             VALUES (:text, :speaker, :season, :episode, :image_path)',
         );
         $stmt->execute([
             'text' => $data['text'],
             'speaker' => $data['speaker'],
             'season' => $data['season'] ?: null,
             'episode' => $data['episode'] ?: null,
+            'image_path' => $data['image_path'] ?? null,
         ]);
 
         return (int) $this->db->lastInsertId();
@@ -71,7 +67,8 @@ final class Quote
     {
         $stmt = $this->db->prepare(
             'UPDATE quotes
-             SET text = :text, speaker = :speaker, season = :season, episode = :episode
+             SET text = :text, speaker = :speaker, season = :season, episode = :episode,
+                 image_path = :image_path
              WHERE id = :id',
         );
 
@@ -81,6 +78,7 @@ final class Quote
             'speaker' => $data['speaker'],
             'season' => $data['season'] ?: null,
             'episode' => $data['episode'] ?: null,
+            'image_path' => $data['image_path'] ?? null,
         ]);
     }
 

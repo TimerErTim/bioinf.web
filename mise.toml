@@ -3,7 +3,7 @@ mysql = "latest"
 typst = "0.14.2"
 
 [vars]
-team_nr = "4"
+team_nr = "7"
 
 [env]
 TYPST_ROOT = "{{config_root}}"

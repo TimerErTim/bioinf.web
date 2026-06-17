@@ -7,10 +7,7 @@ namespace App\Model;
 use PDO;
 
 /*
- * Comment table access.
- *
- * LEFT JOIN users: keep comments even when user_id is NULL (deleted author).
- * username comes from join; NULL username means show <deleted> in the view.
+ * Comment table access with threaded replies (parent_id self-FK).
  */
 final class Comment
 {
@@ -24,7 +21,7 @@ final class Comment
     public function findByQuoteId(int $quoteId): array
     {
         $stmt = $this->db->prepare(
-            'SELECT c.*, u.username
+            'SELECT c.*, u.username, u.avatar_path
              FROM comments c
              LEFT JOIN users u ON u.id = c.user_id
              WHERE c.quote_id = :quote_id
@@ -35,10 +32,24 @@ final class Comment
         return $stmt->fetchAll();
     }
 
+    /** @return list<array<string, mixed>> */
+    public function buildTree(int $quoteId): array
+    {
+        return self::nestComments($this->findByQuoteId($quoteId));
+    }
+
+    public function countByQuoteId(int $quoteId): int
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM comments WHERE quote_id = :quote_id');
+        $stmt->execute(['quote_id' => $quoteId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     public function findById(int $id): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT c.*, u.username
+            'SELECT c.*, u.username, u.avatar_path
              FROM comments c
              LEFT JOIN users u ON u.id = c.user_id
              WHERE c.id = :id',
@@ -49,14 +60,16 @@ final class Comment
         return $row ?: null;
     }
 
-    public function create(int $quoteId, int $userId, string $content): int
+    public function create(int $quoteId, int $userId, string $content, ?int $parentId = null): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO comments (quote_id, user_id, content) VALUES (:quote_id, :user_id, :content)',
+            'INSERT INTO comments (quote_id, user_id, parent_id, content)
+             VALUES (:quote_id, :user_id, :parent_id, :content)',
         );
         $stmt->execute([
             'quote_id' => $quoteId,
             'user_id' => $userId,
+            'parent_id' => $parentId,
             'content' => $content,
         ]);
 
@@ -77,5 +90,23 @@ final class Comment
         $stmt = $this->db->prepare('DELETE FROM comments WHERE id = :id');
 
         return $stmt->execute(['id' => $id]);
+    }
+
+    /**
+     * @param list<array<string, mixed>> $flat
+     * @return list<array<string, mixed>>
+     */
+    private static function nestComments(array $flat, ?int $parentId = null): array
+    {
+        $branch = [];
+        foreach ($flat as $comment) {
+            $pid = $comment['parent_id'] !== null ? (int) $comment['parent_id'] : null;
+            if ($pid === $parentId) {
+                $comment['children'] = self::nestComments($flat, (int) $comment['id']);
+                $branch[] = $comment;
+            }
+        }
+
+        return $branch;
     }
 }

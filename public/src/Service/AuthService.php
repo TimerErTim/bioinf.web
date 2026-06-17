@@ -8,32 +8,28 @@ use App\Flash;
 use App\Response;
 use App\View;
 
-/*
- * Keeps login state in $_SESSION (server-side, per browser session).
- *
- * Similar role to HttpSession in Java servlets, but PHP uses the $_SESSION
- * superglobal array instead of session.getAttribute().
- *
- * We never store passwords in the session, only user id, username, and admin flag.
- */
 final class AuthService
 {
-    public static function login(int $userId, string $username, bool $isAdmin): void
+    public static function login(int $userId, string $username, bool $isAdmin, ?string $avatarPath = null): void
     {
-        /*
-         * New session ID after login reduces session fixation risk
-         * (attacker cannot reuse an old session id they gave the victim).
-         */
         session_regenerate_id(true);
         $_SESSION['user_id'] = $userId;
         $_SESSION['username'] = $username;
         $_SESSION['is_admin'] = $isAdmin;
+        $_SESSION['avatar_path'] = $avatarPath;
     }
 
     public static function logout(): void
     {
-        unset($_SESSION['user_id'], $_SESSION['username'], $_SESSION['is_admin']);
+        unset($_SESSION['user_id'], $_SESSION['username'], $_SESSION['is_admin'], $_SESSION['avatar_path']);
         session_regenerate_id(true);
+    }
+
+    public static function refreshAvatar(?string $avatarPath): void
+    {
+        if (self::check()) {
+            $_SESSION['avatar_path'] = $avatarPath;
+        }
     }
 
     public static function check(): bool
@@ -51,12 +47,18 @@ final class AuthService
         return $_SESSION['username'] ?? null;
     }
 
+    public static function avatarPath(): ?string
+    {
+        $path = $_SESSION['avatar_path'] ?? null;
+
+        return is_string($path) && $path !== '' ? $path : null;
+    }
+
     public static function isAdmin(): bool
     {
         return !empty($_SESSION['is_admin']);
     }
 
-    /** Redirect to login if not authenticated. */
     public static function requireLogin(): void
     {
         if (!self::check()) {
@@ -65,7 +67,6 @@ final class AuthService
         }
     }
 
-    /** requireLogin + must be admin, otherwise 403. */
     public static function requireAdmin(): void
     {
         self::requireLogin();

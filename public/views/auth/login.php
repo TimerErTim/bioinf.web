@@ -7,33 +7,33 @@ use App\Html;
 /** @var string $username */
 /** @var list<string> $errors */
 ?>
-<h1>Login</h1>
+<h1 class="text-2xl font-bold text-stone-100 mb-6">Login</h1>
 
 <?php if ($errors !== []): ?>
-    <ul class="error-list">
+    <ul class="mb-4 space-y-1 text-sm text-red-400 rounded-xl border border-red-900/50 bg-red-950/30 px-4 py-3">
         <?php foreach ($errors as $error): ?>
             <li><?= Html::e($error) ?></li>
         <?php endforeach; ?>
     </ul>
 <?php endif; ?>
 
-<div class="card">
-    <form method="post" action="/login">
+<div class="rounded-2xl border border-stone-800 bg-stone-900/50 p-6 max-w-md">
+    <form method="post" action="/login" class="space-y-4">
         <?= Csrf::field() ?>
-        <div class="form-group">
-            <label for="username">Benutzername</label>
-            <input type="text" id="username" name="username" class="form-control"
-                   value="<?= Html::e($username) ?>" required autocomplete="username">
+        <div>
+            <label for="username" class="block text-sm font-medium text-stone-300 mb-1">Benutzername</label>
+            <input type="text" id="username" name="username" required autocomplete="username"
+                   value="<?= Html::e($username) ?>"
+                   class="w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2 text-stone-100 focus:border-amber-600 focus:ring-1 focus:ring-amber-600 outline-none">
         </div>
-        <div class="form-group">
-            <label for="password">Passwort</label>
-            <input type="password" id="password" name="password" class="form-control"
-                   required autocomplete="current-password">
+        <div>
+            <label for="password" class="block text-sm font-medium text-stone-300 mb-1">Passwort</label>
+            <input type="password" id="password" name="password" required autocomplete="current-password"
+                   class="w-full rounded-lg border border-stone-700 bg-stone-950 px-3 py-2 text-stone-100 focus:border-amber-600 focus:ring-1 focus:ring-amber-600 outline-none">
         </div>
-        <button type="submit" class="btn btn-primary">Einloggen</button>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-semibold transition-colors cursor-pointer">Einloggen</button>
     </form>
 </div>
 
-<p>Noch kein Konto? <a href="/register">Registrieren</a></p>
-
-<p class="form-hint">Demo-Admin: <code>admin</code> / <code>admin</code></p>
+<p class="mt-4 text-sm text-stone-500">Noch kein Konto? <a href="/register" class="text-amber-500 hover:text-amber-400">Registrieren</a></p>
+<p class="mt-2 text-xs text-stone-600">Demo-Admin: admin / admin</p>

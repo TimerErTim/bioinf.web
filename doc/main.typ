@@ -21,7 +21,7 @@
 
 = Einleitung
 
-Diese Dokumentation beschreibt die Webanwendung *GoT Quotes*. Es ist eine PHP-Anwendung im MVC-Pattern, die berühmte Game-of-Thrones-Zitate präsentiert. Eingeloggte Nutzer können Kommentare verfassen, bearbeiten und löschen. Administratoren verwalten Benutzer und Zitate.
+Diese Dokumentation beschreibt die Webanwendung *GoT Quotes*. Es ist eine PHP-Anwendung im MVC-Pattern, die berühmte Game-of-Thrones-Zitate als *Foren-Posts* präsentiert. Eingeloggte Nutzer diskutieren in *threadartigen Kommentarbäumen* (Antworten auf Antworten). Administratoren verwalten Benutzer, Zitate inkl. Bild-Uploads; Nutzer können optionale Profilbilder setzen.
 
 *Start-URL (XAMPP):* `http://localhost/`. Document Root muss auf das Verzeichnis `public/` zeigen.
 
@@ -44,7 +44,9 @@ Die Anwendung erfüllt die Pflichtanforderungen der Projektangabe:
 - Vollständiges CRUD für Kommentare (Haupt-Ressource) und Zitate (Admin)
 - Benutzerverwaltung für Admins (Löschen, Rolle ändern)
 - Serverseitige Validierung, SQL-Injection- und XSS-Schutz
-- Valides HTML5, CSS-Layout, keine JS-Validierung
+- Valides HTML5, Tailwind CSS 4 (CDN), JavaScript nur für REST-DELETE/PATCH (Fetch)
+- REST-konforme HTTP-Methoden (GET/POST/PUT/PATCH/DELETE)
+- Thread-Kommentare, Bild-Uploads (Zitate/Avatare)
 
 == Rollenmodell
 
@@ -72,6 +74,7 @@ erDiagram
     string username UK
     string password_hash
     bool is_admin
+    string avatar_path "NULL"
     datetime created_at
   }
   quotes {
@@ -80,18 +83,21 @@ erDiagram
     string speaker
     int season
     int episode
+    string image_path "NULL"
     datetime created_at
   }
   comments {
     int id PK
     int quote_id FK
     int user_id FK "NULL, ON DELETE SET NULL"
+    int parent_id FK "NULL, self, ON DELETE CASCADE"
     text content
     datetime created_at
     datetime updated_at
   }
   users ||--o{ comments : "writes"
   quotes ||--o{ comments : "has CASCADE"
+  comments ||--o{ comments : "replies CASCADE"
 ```
 
 == Tabellen
@@ -105,6 +111,7 @@ erDiagram
   [username], [VARCHAR(50)], [NOT NULL, UNIQUE],
   [password_hash], [VARCHAR(255)], [NOT NULL],
   [is_admin], [TINYINT(1)], [NOT NULL, DEFAULT 0],
+  [avatar_path], [VARCHAR(255)], [NULL, Profilbild unter /uploads/avatars/],
   [created_at], [DATETIME], [DEFAULT CURRENT_TIMESTAMP],
 )
 
@@ -117,6 +124,7 @@ erDiagram
   [text], [TEXT], [NOT NULL],
   [speaker], [VARCHAR(100)], [NOT NULL],
   [season / episode], [TINYINT UNSIGNED], [NULL, optional],
+  [image_path], [VARCHAR(255)], [NULL, Beitragsbild unter /uploads/quotes/],
   [created_at], [DATETIME], [DEFAULT CURRENT_TIMESTAMP],
 )
 
@@ -128,6 +136,7 @@ erDiagram
   [id], [INT UNSIGNED], [PK, AUTO_INCREMENT],
   [quote_id], [INT UNSIGNED], [FK → quotes.id, ON DELETE CASCADE],
   [user_id], [INT UNSIGNED], [FK → users.id, NULL, ON DELETE SET NULL],
+  [parent_id], [INT UNSIGNED], [FK → comments.id, NULL, ON DELETE CASCADE],
   [content], [TEXT], [NOT NULL],
   [created_at], [DATETIME], [DEFAULT CURRENT_TIMESTAMP],
   [updated_at], [DATETIME], [NULL ON UPDATE],
@@ -139,7 +148,7 @@ SQL-Dump: `sql/WEB4_PHP_TEAM4.sql`
 
 - Admin: `admin` / `admin`
 - Testuser: `tyrion_fan`, `arya_fan` (Passwort: `password123`)
-- 12 Zitate, 15 Kommentare
+- 12 Zitate, 17 Kommentare (inkl. verschachtelter Antworten)
 
 = Session und Login
 
@@ -187,26 +196,39 @@ digraph MVC {
 
 ```
 public/
-├── index.php              # Front Controller
+├── index.php              # Front Controller, REST-Routing
 ├── .htaccess              # URL Rewriting
-├── assets/css/app.css
+├── assets/js/app.js       # Fetch DELETE/PATCH
+├── uploads/               # Avatare & Zitatbilder
 ├── src/
 │   ├── bootstrap.php
 │   ├── config.php
-│   ├── Router.php
-│   ├── Controller/        # Auth, Quote, Comment, Admin/*
+│   ├── Router.php         # GET, POST, PUT, PATCH, DELETE
+│   ├── Controller/        # Auth, Profile, Quote, Comment, Admin/*
 │   ├── Model/             # User, Quote, Comment
-│   └── Service/           # AuthService, ValidationService
-└── views/                 # PHP HTML-Templates
+│   └── Service/           # AuthService, ValidationService, UploadService
+└── views/                 # PHP HTML-Templates (Tailwind CDN)
 ```
 
-== Request-Flow (Beispiel: Kommentar erstellen)
+== Request-Flow (Beispiel: Kommentar löschen)
 
-1. `POST /quotes/{id}/comments` → Router
-2. `CommentController::store`: CSRF prüfen, Login erzwingen
-3. `ValidationService::commentContent`: serverseitige Validierung
-4. `Comment::create`: Prepared Statement mit Session-`user_id`
-5. Redirect zur Zitat-Detailseite mit Flash-Message
+1. `DELETE /comments/{id}` → Router (Fetch aus `app.js`)
+2. `CommentController::destroy`: CSRF via `X-CSRF-Token`, Login, Berechtigung
+3. `Comment::delete`: Prepared Statement; CASCADE löscht Antworten
+4. Redirect zur Zitat-Detailseite mit Flash-Message
+
+== REST-Routing (Auszug)
+
+#table(
+  columns: (1fr, 2fr, 2fr),
+  table.header[*Methode*][*Pfad*][*Aktion*],
+  [GET], [/], [Zitate-Feed],
+  [POST], [/quotes/{id}/comments], [Top-Level-Kommentar],
+  [POST], [/comments/{id}/replies], [Thread-Antwort],
+  [DELETE], [/comments/{id}], [Kommentar löschen (Fetch)],
+  [DELETE], [/admin/quotes/{id}], [Zitat löschen (Fetch)],
+  [PATCH], [/admin/users/{id}/admin], [Admin-Rolle toggeln (Fetch)],
+)
 
 = Sicherheitskonzept
 
@@ -219,7 +241,8 @@ public/
   [CSRF], [Token in allen POST-Formularen, Validierung in Controllern],
   [IDOR], [Berechtigungsprüfung: Kommentar-Bearbeitung nur für Autor],
   [Passwörter], [`password_hash()` / `password_verify()`, PASSWORD_DEFAULT],
-  [Kein JS], [Kein striktes REST #sym.arrow ausschließlich standard Form Methods reichen aus]
+  [REST / JS], [DELETE und PATCH per Fetch + CSRF-Header; Validierung nur serverseitig],
+  [Uploads], [MIME-Check via finfo, Größenlimit, `/uploads/.htaccess` ohne Script-Ausführung],
 )
 
 = Testfälle

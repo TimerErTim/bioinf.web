@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Database;
+use App\Flash;
 use App\Model\Comment;
 use App\Model\Quote;
 use App\Response;
 use App\View;
 
-// Public quote pages (no login required to read).
 final class QuoteController
 {
     private const PAGE_SIZE = 20;
@@ -27,7 +27,6 @@ final class QuoteController
 
     public function index(): void
     {
-        // Pagination via ?page=2 in query string ($_GET).
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $total = $this->quotes->countAll();
         $totalPages = max(1, (int) ceil($total / self::PAGE_SIZE));
@@ -35,7 +34,7 @@ final class QuoteController
         $offset = ($page - 1) * self::PAGE_SIZE;
 
         View::render('quotes/index', [
-            'title' => 'Game of Thrones Zitate',
+            'title' => 'Zitate-Forum',
             'quotes' => $this->quotes->findAll(self::PAGE_SIZE, $offset),
             'page' => $page,
             'totalPages' => $totalPages,
@@ -55,9 +54,11 @@ final class QuoteController
         View::render('quotes/show', [
             'title' => 'Zitat von ' . $quote['speaker'],
             'quote' => $quote,
-            'comments' => $this->comments->findByQuoteId($quoteId),
+            'commentTree' => $this->comments->buildTree($quoteId),
+            'commentCount' => $this->comments->countByQuoteId($quoteId),
             'commentErrors' => [],
             'oldComment' => '',
+            'replyToId' => null,
         ]);
     }
 }

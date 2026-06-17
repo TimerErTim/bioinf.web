@@ -9,10 +9,10 @@ use App\Flash;
 use App\Model\Quote;
 use App\Response;
 use App\Service\AuthService;
+use App\Service\UploadService;
 use App\Service\ValidationService;
 use App\View;
 
-// Admin quote CRUD. requireAdmin() runs at start of each action.
 final class QuoteController
 {
     private Quote $quotes;
@@ -36,12 +36,6 @@ final class QuoteController
     {
         AuthService::requireAdmin();
 
-        // Same URL for GET (show form) and POST (save). Check method inside.
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->handleSave(null);
-            return;
-        }
-
         View::render('admin/quotes/create', [
             'title' => 'Neues Zitat',
             'quote' => $this->emptyQuote(),
@@ -49,7 +43,16 @@ final class QuoteController
         ]);
     }
 
-    public function update(string $id): void
+    public function store(): void
+    {
+        Response::requirePost();
+        Response::requireCsrf();
+        AuthService::requireAdmin();
+
+        $this->handleSave(null);
+    }
+
+    public function edit(string $id): void
     {
         AuthService::requireAdmin();
 
@@ -59,11 +62,6 @@ final class QuoteController
             Response::notFound();
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->handleSave($quoteId);
-            return;
-        }
-
         View::render('admin/quotes/edit', [
             'title' => 'Zitat bearbeiten',
             'quote' => $quote,
@@ -71,17 +69,28 @@ final class QuoteController
         ]);
     }
 
-    public function delete(string $id): void
+    public function update(string $id): void
     {
         Response::requirePost();
         Response::requireCsrf();
         AuthService::requireAdmin();
 
+        $this->handleSave((int) $id);
+    }
+
+    public function destroy(string $id): void
+    {
+        Response::requireMethod(['DELETE']);
+        Response::requireCsrf();
+        AuthService::requireAdmin();
+
         $quoteId = (int) $id;
-        if ($this->quotes->findById($quoteId) === null) {
+        $quote = $this->quotes->findById($quoteId);
+        if ($quote === null) {
             Response::notFound();
         }
 
+        UploadService::deleteFile($quote['image_path'] ?? null);
         $this->quotes->delete($quoteId);
         Flash::success('Zitat gelöscht.');
         View::redirect('/admin/quotes');
@@ -89,14 +98,17 @@ final class QuoteController
 
     private function handleSave(?int $quoteId): void
     {
-        Response::requirePost();
-        Response::requireCsrf();
+        $existing = $quoteId !== null ? $this->quotes->findById($quoteId) : null;
+        if ($quoteId !== null && $existing === null) {
+            Response::notFound();
+        }
 
         $data = [
             'text' => trim($_POST['text'] ?? ''),
             'speaker' => trim($_POST['speaker'] ?? ''),
             'season' => trim($_POST['season'] ?? '') !== '' ? (int) $_POST['season'] : null,
             'episode' => trim($_POST['episode'] ?? '') !== '' ? (int) $_POST['episode'] : null,
+            'image_path' => $existing['image_path'] ?? null,
         ];
 
         $errors = array_merge(
@@ -106,13 +118,29 @@ final class QuoteController
             ValidationService::optionalUint($_POST['episode'] ?? null, 'Episode'),
         );
 
+        if (isset($_FILES['image'])) {
+            $upload = UploadService::storeImage($_FILES['image'], 'quotes');
+            $errors = array_merge($errors, $upload['errors']);
+            if ($upload['path'] !== null) {
+                if ($existing !== null && !empty($existing['image_path'])) {
+                    UploadService::deleteFile($existing['image_path']);
+                }
+                $data['image_path'] = $upload['path'];
+            }
+        }
+
+        if (!empty($_POST['remove_image']) && $existing !== null) {
+            UploadService::deleteFile($existing['image_path'] ?? null);
+            $data['image_path'] = null;
+        }
+
         $view = $quoteId === null ? 'admin/quotes/create' : 'admin/quotes/edit';
         $title = $quoteId === null ? 'Neues Zitat' : 'Zitat bearbeiten';
 
         if ($errors !== []) {
             View::render($view, [
                 'title' => $title,
-                'quote' => $quoteId === null ? $data : array_merge(['id' => $quoteId], $data),
+                'quote' => $quoteId === null ? $data : array_merge($existing, $data),
                 'errors' => $errors,
             ]);
             return;
@@ -136,6 +164,7 @@ final class QuoteController
             'speaker' => '',
             'season' => '',
             'episode' => '',
+            'image_path' => null,
         ];
     }
 }

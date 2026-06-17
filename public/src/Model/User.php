@@ -6,15 +6,6 @@ namespace App\Model;
 
 use PDO;
 
-/*
- * User table access. Each method runs SQL via PDO.
- *
- * Pattern used everywhere in models:
- *   $stmt = $db->prepare('... WHERE id = :id');  // :id is a placeholder
- *   $stmt->execute(['id' => $id]);                 // values are bound safely
- *
- * Never build SQL with string concatenation and user input.
- */
 final class User
 {
     private PDO $db;
@@ -44,23 +35,34 @@ final class User
 
     public function findAll(): array
     {
-        $stmt = $this->db->query('SELECT id, username, is_admin, created_at FROM users ORDER BY created_at ASC');
+        $stmt = $this->db->query(
+            'SELECT id, username, is_admin, avatar_path, created_at FROM users ORDER BY created_at ASC',
+        );
 
         return $stmt->fetchAll();
     }
 
-    public function create(string $username, string $passwordHash, bool $isAdmin = false): int
+    public function create(string $username, string $passwordHash, bool $isAdmin = false, ?string $avatarPath = null): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO users (username, password_hash, is_admin) VALUES (:username, :password_hash, :is_admin)',
+            'INSERT INTO users (username, password_hash, is_admin, avatar_path)
+             VALUES (:username, :password_hash, :is_admin, :avatar_path)',
         );
         $stmt->execute([
             'username' => $username,
             'password_hash' => $passwordHash,
             'is_admin' => $isAdmin ? 1 : 0,
+            'avatar_path' => $avatarPath,
         ]);
 
         return (int) $this->db->lastInsertId();
+    }
+
+    public function updateAvatar(int $id, ?string $avatarPath): bool
+    {
+        $stmt = $this->db->prepare('UPDATE users SET avatar_path = :avatar_path WHERE id = :id');
+
+        return $stmt->execute(['id' => $id, 'avatar_path' => $avatarPath]);
     }
 
     public function delete(int $id): bool
@@ -87,7 +89,6 @@ final class User
         return (int) $stmt->fetchColumn();
     }
 
-    /** Compare plain password with bcrypt hash from database. */
     public function verifyPassword(array $user, string $password): bool
     {
         return password_verify($password, $user['password_hash']);

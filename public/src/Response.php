@@ -7,8 +7,7 @@ namespace App;
 /*
  * Small HTTP helpers used by controllers before doing work.
  *
- * Mutating actions (delete, update, login) should use POST, not GET.
- * GET links can be prefetched or opened by accident; POST + CSRF is safer.
+ * REST: DELETE/PATCH/PUT use Fetch from the browser; CSRF via header or form field.
  */
 final class Response
 {
@@ -26,18 +25,35 @@ final class Response
         exit;
     }
 
+    public static function methodNotAllowed(): void
+    {
+        http_response_code(405);
+        exit;
+    }
+
+    /** @param list<string> $allowed */
+    public static function requireMethod(array $allowed): void
+    {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        if (!in_array($method, $allowed, true)) {
+            self::methodNotAllowed();
+        }
+    }
+
     public static function requirePost(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            exit;
-        }
+        self::requireMethod(['POST']);
     }
 
     public static function requireCsrf(): void
     {
-        // $_POST contains form fields from the request body (POST only).
-        if (!Csrf::validate($_POST['_csrf'] ?? null)) {
+        $token = $_POST['_csrf'] ?? null;
+
+        if ($token === null) {
+            $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+        }
+
+        if (!Csrf::validate(is_string($token) ? $token : null)) {
             Flash::error('Sicherheits-Token ungültig. Bitte nochmal versuchen.');
             View::redirect('/');
         }

@@ -1,55 +1,57 @@
 <?php
 
-use App\Csrf;
 use App\Html;
+
+require __DIR__ . '/../../partials/avatar.php';
+require __DIR__ . '/../../partials/delete-button.php';
 
 /** @var string $title */
 /** @var list<array<string, mixed>> $users */
 /** @var int|null $currentUserId */
 ?>
-<h1>Benutzerverwaltung</h1>
+<h1 class="text-2xl font-bold text-stone-100 mb-6">Benutzerverwaltung</h1>
 
-<div class="table-wrap">
-    <table>
-        <thead>
+<div class="overflow-x-auto rounded-2xl border border-stone-800">
+    <table class="w-full text-sm text-left">
+        <thead class="bg-stone-900 text-stone-400 uppercase text-xs tracking-wider">
             <tr>
-                <th>ID</th>
-                <th>Benutzername</th>
-                <th>Rolle</th>
-                <th>Registriert</th>
-                <th>Aktionen</th>
+                <th class="px-4 py-3">ID</th>
+                <th class="px-4 py-3">Benutzer</th>
+                <th class="px-4 py-3">Rolle</th>
+                <th class="px-4 py-3">Registriert</th>
+                <th class="px-4 py-3">Aktionen</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-stone-800">
             <?php foreach ($users as $user): ?>
-                <tr>
-                    <td><?= (int) $user['id'] ?></td>
-                    <td><?= Html::e($user['username']) ?></td>
-                    <td>
+                <tr class="hover:bg-stone-900/50">
+                    <td class="px-4 py-3 text-stone-500"><?= (int) $user['id'] ?></td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <?php renderAvatar($user, 'sm'); ?>
+                            <span class="text-stone-200"><?= Html::e($user['username']) ?></span>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
                         <?php if ((bool) $user['is_admin']): ?>
-                            <span class="badge badge-admin">Admin</span>
+                            <span class="inline-flex px-2 py-0.5 rounded-full text-xs bg-amber-950 text-amber-400 border border-amber-800/50">Admin</span>
                         <?php else: ?>
-                            <span class="badge badge-user">User</span>
+                            <span class="inline-flex px-2 py-0.5 rounded-full text-xs bg-stone-800 text-stone-400">User</span>
                         <?php endif; ?>
                     </td>
-                    <td><?= Html::e(date('d.m.Y', strtotime($user['created_at']))) ?></td>
-                    <td>
+                    <td class="px-4 py-3 text-stone-500"><?= Html::e(date('d.m.Y', strtotime($user['created_at']))) ?></td>
+                    <td class="px-4 py-3">
                         <?php if ((int) $user['id'] !== $currentUserId): ?>
-                            <form class="inline-form" method="post"
-                                  action="/admin/users/<?= (int) $user['id'] ?>/toggle-admin">
-                                <?= Csrf::field() ?>
-                                <button type="submit" class="btn btn-secondary btn-sm">
-                                    <?= (bool) $user['is_admin'] ? 'Admin entziehen' : 'Zum Admin machen' ?>
-                                </button>
-                            </form>
-                            <form class="inline-form" method="post"
-                                  action="/admin/users/<?= (int) $user['id'] ?>/delete"
-                                  onsubmit="return confirm('Benutzer wirklich löschen?');">
-                                <?= Csrf::field() ?>
-                                <button type="submit" class="btn btn-danger btn-sm">Löschen</button>
-                            </form>
+                            <div class="flex flex-wrap gap-2">
+                                <?php renderPatchButton(
+                                    '/admin/users/' . (int) $user['id'] . '/admin',
+                                    (bool) $user['is_admin'] ? 'Admin entziehen' : 'Zum Admin machen',
+                                    'Rolle wirklich ändern?',
+                                ); ?>
+                                <?php renderDeleteButton('/admin/users/' . (int) $user['id'], 'Löschen', 'Benutzer wirklich löschen?'); ?>
+                            </div>
                         <?php else: ?>
-                            <span class="quote-meta">(Du)</span>
+                            <span class="text-stone-600 text-xs">(Du)</span>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -58,4 +60,4 @@ use App\Html;
     </table>
 </div>
 
-<p><a href="/">← Zurück zur Startseite</a></p>
+<p class="mt-4"><a href="/" class="text-sm text-stone-500 hover:text-amber-400">← Zurück zur Startseite</a></p>

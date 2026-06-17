@@ -25,6 +25,21 @@ final class Router
         $this->add('POST', $pattern, $handler);
     }
 
+    public function put(string $pattern, callable $handler): void
+    {
+        $this->add('PUT', $pattern, $handler);
+    }
+
+    public function patch(string $pattern, callable $handler): void
+    {
+        $this->add('PATCH', $pattern, $handler);
+    }
+
+    public function delete(string $pattern, callable $handler): void
+    {
+        $this->add('DELETE', $pattern, $handler);
+    }
+
     public function dispatch(string $method, string $uri): void
     {
         // Strip query string (?page=2) and normalize trailing slash.

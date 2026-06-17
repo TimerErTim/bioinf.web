@@ -13,7 +13,6 @@ use App\Service\AuthService;
 use App\Service\ValidationService;
 use App\View;
 
-// Comments: create, edit, delete. Main CRUD resource for logged-in users.
 final class CommentController
 {
     private Quote $quotes;
@@ -26,36 +25,33 @@ final class CommentController
         $this->comments = new Comment($pdo);
     }
 
-    public function store(string $id): void
+    public function store(string $quoteId): void
     {
         Response::requirePost();
         Response::requireCsrf();
         AuthService::requireLogin();
 
-        $quoteId = (int) $id;
-        $quote = $this->quotes->findById($quoteId);
+        $qid = (int) $quoteId;
+        $quote = $this->quotes->findById($qid);
         if ($quote === null) {
             Response::notFound();
         }
 
-        $content = trim($_POST['content'] ?? '');
-        $errors = ValidationService::commentContent($content);
+        $this->saveComment($qid, null);
+    }
 
-        if ($errors !== []) {
-            View::render('quotes/show', [
-                'title' => 'Zitat von ' . $quote['speaker'],
-                'quote' => $quote,
-                'comments' => $this->comments->findByQuoteId($quoteId),
-                'commentErrors' => $errors,
-                'oldComment' => $content,
-            ]);
-            return;
+    public function reply(string $parentId): void
+    {
+        Response::requirePost();
+        Response::requireCsrf();
+        AuthService::requireLogin();
+
+        $parent = $this->comments->findById((int) $parentId);
+        if ($parent === null) {
+            Response::notFound();
         }
 
-        // user_id always comes from session, never from hidden form fields.
-        $this->comments->create($quoteId, AuthService::userId(), $content);
-        Flash::success('Kommentar gespeichert.');
-        View::redirect('/quotes/' . $quoteId);
+        $this->saveComment((int) $parent['quote_id'], (int) $parent['id']);
     }
 
     public function edit(string $id): void
@@ -72,7 +68,7 @@ final class CommentController
 
     public function update(string $id): void
     {
-        Response::requirePost();
+        Response::requireMethod(['PUT', 'POST']);
         Response::requireCsrf();
         AuthService::requireLogin();
 
@@ -94,9 +90,9 @@ final class CommentController
         View::redirect('/quotes/' . $comment['quote_id']);
     }
 
-    public function delete(string $id): void
+    public function destroy(string $id): void
     {
-        Response::requirePost();
+        Response::requireMethod(['DELETE']);
         Response::requireCsrf();
         AuthService::requireLogin();
 
@@ -105,7 +101,6 @@ final class CommentController
             Response::notFound();
         }
 
-        // Owner can delete own comment; admin can delete any comment (not edit others).
         $userId = AuthService::userId();
         $isOwner = $comment['user_id'] !== null && (int) $comment['user_id'] === $userId;
         $isAdmin = AuthService::isAdmin();
@@ -114,15 +109,40 @@ final class CommentController
             Response::forbidden();
         }
 
+        $quoteId = (int) $comment['quote_id'];
         $this->comments->delete((int) $comment['id']);
         Flash::success('Kommentar gelöscht.');
-        View::redirect('/quotes/' . $comment['quote_id']);
+        View::redirect('/quotes/' . $quoteId);
     }
 
-    /**
-     * IDOR check: only the author may edit a comment.
-     * (Insecure Direct Object Reference = changing {id} in URL to access others' data.)
-     */
+    private function saveComment(int $quoteId, ?int $parentId): void
+    {
+        $quote = $this->quotes->findById($quoteId);
+        if ($quote === null) {
+            Response::notFound();
+        }
+
+        $content = trim($_POST['content'] ?? '');
+        $errors = ValidationService::commentContent($content);
+
+        if ($errors !== []) {
+            View::render('quotes/show', [
+                'title' => 'Zitat von ' . $quote['speaker'],
+                'quote' => $quote,
+                'commentTree' => $this->comments->buildTree($quoteId),
+                'commentCount' => $this->comments->countByQuoteId($quoteId),
+                'commentErrors' => $errors,
+                'oldComment' => $content,
+                'replyToId' => $parentId,
+            ]);
+            return;
+        }
+
+        $this->comments->create($quoteId, AuthService::userId(), $content, $parentId);
+        Flash::success($parentId === null ? 'Kommentar gespeichert.' : 'Antwort gespeichert.');
+        View::redirect('/quotes/' . $quoteId . ($parentId !== null ? '#comment-' . $parentId : ''));
+    }
+
     private function loadOwnedComment(int $commentId): array
     {
         $comment = $this->comments->findById($commentId);

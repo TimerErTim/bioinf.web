@@ -9,10 +9,10 @@ use App\Flash;
 use App\Model\User;
 use App\Response;
 use App\Service\AuthService;
+use App\Service\UploadService;
 use App\Service\ValidationService;
 use App\View;
 
-// Register, login, logout. Handles $_POST form data from auth views.
 final class AuthController
 {
     private User $users;
@@ -55,11 +55,21 @@ final class AuthController
             $errors[] = 'Passwörter stimmen nicht überein.';
         }
 
+        $avatarPath = null;
+        if (isset($_FILES['avatar'])) {
+            $upload = UploadService::storeImage($_FILES['avatar'], 'avatars');
+            $errors = array_merge($errors, $upload['errors']);
+            $avatarPath = $upload['path'];
+        }
+
         if ($errors === [] && $this->users->findByUsername($username) !== null) {
             $errors[] = 'Benutzername ist schon vergeben.';
         }
 
         if ($errors !== []) {
+            if ($avatarPath !== null) {
+                UploadService::deleteFile($avatarPath);
+            }
             View::render('auth/register', [
                 'title' => 'Registrierung',
                 'username' => $username,
@@ -68,11 +78,7 @@ final class AuthController
             return;
         }
 
-        /*
-         * password_hash creates a one-way bcrypt hash for storage.
-         * Never save plain passwords. PASSWORD_DEFAULT picks a secure algorithm.
-         */
-        $this->users->create($username, password_hash($password, PASSWORD_DEFAULT));
+        $this->users->create($username, password_hash($password, PASSWORD_DEFAULT), false, $avatarPath);
         Flash::success('Registrierung erfolgreich. Bitte einloggen.');
         View::redirect('/login');
     }
@@ -108,7 +114,12 @@ final class AuthController
             return;
         }
 
-        AuthService::login((int) $user['id'], $user['username'], (bool) $user['is_admin']);
+        AuthService::login(
+            (int) $user['id'],
+            $user['username'],
+            (bool) $user['is_admin'],
+            $user['avatar_path'] ?? null,
+        );
         Flash::success('Willkommen, ' . $user['username'] . '!');
         View::redirect('/');
     }

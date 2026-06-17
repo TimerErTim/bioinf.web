@@ -9,9 +9,9 @@ use App\Flash;
 use App\Model\User;
 use App\Response;
 use App\Service\AuthService;
+use App\Service\UploadService;
 use App\View;
 
-// Admin user list, role toggle, delete. Protects last remaining admin.
 final class UserController
 {
     private User $users;
@@ -34,7 +34,7 @@ final class UserController
 
     public function toggleAdmin(string $id): void
     {
-        Response::requirePost();
+        Response::requireMethod(['PATCH']);
         Response::requireCsrf();
         AuthService::requireAdmin();
 
@@ -45,7 +45,6 @@ final class UserController
             Response::notFound();
         }
 
-        // Cannot demote or delete yourself, or remove the last admin account.
         if ($targetId === AuthService::userId()) {
             Flash::error('Eigene Admin-Rolle kannst du nicht ändern.');
             View::redirect('/admin/users');
@@ -62,9 +61,9 @@ final class UserController
         View::redirect('/admin/users');
     }
 
-    public function delete(string $id): void
+    public function destroy(string $id): void
     {
-        Response::requirePost();
+        Response::requireMethod(['DELETE']);
         Response::requireCsrf();
         AuthService::requireAdmin();
 
@@ -75,11 +74,17 @@ final class UserController
             Response::notFound();
         }
 
+        if ($targetId === AuthService::userId()) {
+            Flash::error('Du kannst dich nicht selbst löschen.');
+            View::redirect('/admin/users');
+        }
+
         if ((bool) $target['is_admin'] && $this->users->countAdmins() <= 1) {
             Flash::error('Letzter Admin kann nicht gelöscht werden.');
             View::redirect('/admin/users');
         }
 
+        UploadService::deleteFile($target['avatar_path'] ?? null);
         $this->users->delete($targetId);
         Flash::success('User gelöscht. Kommentare zeigen jetzt <deleted>.');
         View::redirect('/admin/users');
