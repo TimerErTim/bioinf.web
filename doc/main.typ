@@ -20,69 +20,36 @@
 #show raw.where(lang: "pintora"): it => pintora-diagram(it.text)
 #show raw.where(lang: "graphviz"): diagraph.raw-render.with()
 
-= Einleitung
+= Einleitung und Überblick
 
-Diese Dokumentation beschreibt die Webanwendung *GoT Quotes*, die im Rahmen der Übung WEB4 im Sommersemester 2026 entwickelt wurde. Die Anwendung präsentiert berühmte Game-of-Thrones-Zitate als Forenbeiträge. Besucher können Zitate lesen und sortieren, eingeloggte Nutzer diskutieren in threadartigen Kommentarbäumen, und Administratoren verwalten Benutzer sowie Zitate inklusive optionaler Bild-Uploads.
+Diese Dokumentation beschreibt die Webanwendung *GoT Quotes*, ein Forum für berühmte Game-of-Thrones-Zitate, entwickelt im Rahmen der Übung WEB4 (Sommersemester 2026). Nutzer können Zitate lesen, kommentieren, bewerten und liken. Die Kommentare sind als verschachtelte Threads implementiert. Administratoren verwalten Zitate und Nutzerkonten und können bei Bedarf Bilder zu Zitaten hochladen.
 
-Die Umsetzung folgt dem MVC-Pattern mit PHP 8.x und PDO. Für mindestens eine Ressource sind alle CRUD-Operationen implementiert: Kommentare bilden die zentrale Ressource für normale Nutzer, Zitate werden vollständig im Admin-Bereich gepflegt. Sämtliche Benutzereingaben werden serverseitig validiert, SQL-Injection und XSS werden durch Prepared Statements und konsequentes Escaping abgewehrt.
+Das Projekt setzt auf eine klare Umsetzung bewährter Webstandards: PHP 8.x, objektorientiertes MVC-Pattern, PDO für den Datenbankzugriff, konsequente Verwendung von Prepared Statements sowie serverseitiges Validierungskonzept. Alle Kernfunktionen wie das Kommentarsystem (CRUD), Benutzerverwaltung, Rollen (Gast, Nutzer, Admin) und sichere Formularverarbeitung sind vollständig umgesetzt. Besonders im Fokus stand Schutz vor SQL-Injection und Cross-Site-Scripting (XSS).
 
-*Start-URL (Standard-XAMPP):* `http://localhost/`
+*Start-URL:* `http://localhost/` (nach Entpacken des ZIP-Archivs und Setzen des Apache-Document-Roots auf `public/`)
 
-Damit die Anwendung erreichbar ist, muss der Apache-Document-Root auf das Verzeichnis `public/` zeigen. Unter unserer Entwicklungsumgebung mit `mise` ist die Anwendung alternativ unter `http://127.0.0.1:80/` erreichbar. Der Einstiegspunkt ist stets `public/index.php`.
-
-= Projektmitglieder
-
-Gemäß Projektangabe werden alle beteiligten Personen aufgeführt:
-
+*Projektmitglieder:*
 #table(
   columns: (1fr, 1fr),
   table.header[*Name*][*Matrikelnummer*],
-  [Nathalie Sonnleitner], [-],
+  [Nathalie Sonnleitner], [s2510458003],
   [Tim Peko], [s2420458029],
 )
 
-= Bezug zur Projektangabe
+*Wesentliche Projekt-Highlights:* 
+- MVC-Struktur, saubere Trennung von Controller, Model und View  
+- Forum mit verschachtelten Baum-Kommentaren  
+- Vollständiges Kommentar-CRUD (inkl. Thread-Löschung und Rechteprüfung)  
+- Nutzerrollen: Gast, Nutzer, Admin  
+- Benutzerverwaltung und Zitatpflege durch Admins  
+- Registrierungs- und Login-Mechanismen mit Sessions  
+- Schutz vor XSS & SQL-Injection (Prepared Statements, Escaping)  
+- Serverseitige Validierung aller Eingaben  
+- Datenbankstruktur mit Foreign Keys, CASCADE/SET NULL für Integrität  
+- Keine Abhängigkeit von externen Build-Tools: Läuft direkt auf XAMPP  
+- SQL-Dump und Demodaten enthalten
 
-Die folgende Übersicht ordnet die Pflichtanforderungen aus der Projektangabe der konkreten Umsetzung zu. Jeder Punkt ist im weiteren Verlauf dieser Dokumentation ausführlicher beschrieben.
-
-#table(
-  columns: (2fr, 3fr),
-  table.header[*Anforderung (Projektangabe)*][*Umsetzung in GoT Quotes*],
-  [MVC-Pattern und CRUD für mindestens eine Ressource],
-  [Schichten Controller, Model, View; vollständiges CRUD für Kommentare und Admin-CRUD für Zitate],
-  [Rollen: Gast, eingeloggter User, Admin],
-  [Session mit `is_admin`; unterschiedliche Navigation und Berechtigungen pro Rolle],
-  [Registrierung mit eigener Seite],
-  [`GET/POST /register`; optionaler Avatar-Upload; Redirect zum Login ohne Auto-Login],
-  [Admin-Benutzerverwaltung],
-  [`/admin/users`: Benutzer löschen, Admin-Rolle per PATCH toggeln],
-  [PHP ≥ 8.x, PDO, saubere Schichtentrennung],
-  [Strict Types, eigener Router, Models mit ausschließlich Prepared Statements],
-  [Schutz vor SQL-Injection und XSS],
-  [PDO-Parameterbindung; `htmlspecialchars()` bei jeder HTML-Ausgabe usergenerierter Inhalte],
-  [Serverseitige Validierung aller Eingaben],
-  [`ValidationService` prüft Formulare und Uploads; Fehler direkt am Formular oder per Flash],
-  [Self-contained ohne Composer/npm],
-  [ZIP auf XAMPP kopierbar; Tailwind CSS 4 und httpYac nur optional für Entwicklung],
-  [MySQL/MariaDB mit sinnvollem Schema],
-  [Normalisierte Tabellen, FK-Constraints, ON DELETE CASCADE bzw. SET NULL],
-  [Valides HTML5, Formatierung per CSS],
-  [Semantisches HTML5; Tailwind CSS 4 per CDN; kein Inline-Styling als Hauptmechanismus],
-  [JavaScript nicht für Validierung],
-  [`app.js` nur für Fetch (DELETE/PATCH) und UI-Helfer; Validierung ausschließlich serverseitig],
-  [ER-/UML-Diagramm, Architekturbeschreibung, Start-URL, Team],
-  [Dieses PDF-Dokument in `doc/`],
-  [Ausführliche Tests inkl. fehlerhafter Eingaben],
-  [Automatisierte httpYac-Tests plus dokumentierte manuelle UI-Tests],
-  [SQL-Dump mit CREATE DATABASE und Testdaten],
-  [`WEB4_PHP_TEAM7.sql`; Datenbank `team_7`, User `fh_webphp`],
-)
-
-= Anwendungsüberblick
-
-GoT Quotes verbindet ein Zitate-Archiv mit Forenfunktionen. Jeder Datensatz in der Tabelle `quotes` entspricht einem Forenpost mit Zitattext, Sprecher, optional Staffel und Episode sowie optionalem Beitragsbild. Unter jedem Zitat entsteht eine Diskussion: Top-Level-Kommentare hängen direkt am Zitat, Antworten referenzieren über `parent_id` den jeweiligen Elternkommentar. Dadurch entsteht ein Baum beliebiger Tiefe, der in der Oberfläche eingerückt dargestellt wird.
-
-Eingeloggte Nutzer können Zitate liken, Kommentare bewerten und ihr Profilbild pflegen. Administratoren erhalten zusätzlich Zugriff auf die Benutzerverwaltung und die Zitat-Pflege. Gäste sehen Feed, Detailseiten und öffentliche Profile, dürfen sich registrieren und einloggen, können aber weder kommentieren noch liken.
+Weitere Details zur Architektur, Implementierung und zum Datenmodell folgen auf den nächsten Seiten.
 
 == Nutzerfluss nach Rolle
 
@@ -95,7 +62,6 @@ activityDiagram
   if (Eingeloggt?) then (nein)
     :Feed lesen;
     :Registrieren oder Login;
-    stop
   else (ja)
     if (Admin?) then (ja)
       :Feed, Profil oder Admin;
@@ -104,8 +70,8 @@ activityDiagram
       :Feed, Profil, Kommentare;
       :Like, Vote, Antworten;
     endif
-    stop
   endif
+  end
 ```
 
 == Rollen und Berechtigungen
@@ -118,6 +84,7 @@ Drei Rollen steuern den Zugriff. Gäste sind nicht authentifiziert. Benutzer (`i
   [Zitate und Kommentare lesen], [✓], [✓], [✓],
   [Registrierung und Login], [✓], [✓], [✓],
   [Kommentar schreiben, eigenes bearbeiten und löschen], [-], [✓], [✓],
+  [Kommentare und Zitate bewerten bzw. liken], [-], [✓], [✓],
   [Fremden Kommentar löschen], [-], [-], [✓],
   [Fremden Kommentar bearbeiten], [-], [-], [✗],
   [Zitate verwalten (CRUD)], [-], [-], [✓],
@@ -259,10 +226,11 @@ Der SQL-Dump `WEB4_PHP_TEAM7.sql` enthält das `CREATE DATABASE`-Statement, Tabe
 - Admin: `admin` / `admin`
 - Testnutzer: `tyrion_fan`, `arya_fan` (Passwort jeweils `password123`)
 - 12 Zitate, 17 Kommentare inklusive verschachtelter Antworten, Likes und Votes
+- Bilder sind *nicht* inkludiert, können aber manuell hochgeladen werden
 
 = Architektur
 
-== Schichtenmodell (MVC)
+== MVC
 
 Die Projektangabe verlangt eine saubere Trennung der Anwendungsschichten. GoT Quotes implementiert klassisches MVC: Der Front Controller `index.php` leitet jede HTTP-Anfrage an den Router weiter. Controller orchestrieren Geschäftslogik und Berechtigungen, Models kapseln den PDO-Datenbankzugriff, Views rendern HTML mit escaped Ausgabe.
 
@@ -302,21 +270,30 @@ componentDiagram
 
 == Verzeichnisstruktur
 
+#{
+show: conch.terminal-frame.with(
+width: 100%,
+theme: "catppuccin",
+title: [public/ directory structure],
+style: (inset: (top: -0.5em, rest: 1em)),
+)
+set text(size: 8.25pt)
 ```
 public/
-├── index.php              # Front Controller, REST-Routing, _method-Override
-├── .htaccess              # URL Rewriting
-├── assets/js/app.js       # Fetch für DELETE/PATCH, Thread-UI
-├── uploads/               # Avatare und Zitatbilder (.htaccess ohne Script-Ausführung)
+├── index.php             # Front Controller, REST-Routing, _method-Override
+├── .htaccess             # URL Rewriting
+├── assets/js/app.js      # Fetch für DELETE/PATCH, Thread-UI
+├── uploads/              # Avatare und Zitatbilder (.htaccess ohne Script-Ausführung)
 ├── src/
 │   ├── bootstrap.php
 │   ├── config.php
-│   ├── Router.php         # GET, POST, PUT, PATCH, DELETE
-│   ├── Controller/        # Auth, Profile, Quote, Comment, Admin/*
-│   ├── Model/             # User, Quote, Comment, QuoteLike, CommentVote
-│   └── Service/           # AuthService, ValidationService, UploadService
-└── views/                 # PHP-Templates (Tailwind CDN)
-```
+│   ├── Router.php        # GET, POST, PUT, PATCH, DELETE
+│   ├── Controller/       # Auth, Profile, Quote, Comment, Admin/*
+│   ├── Model/            # User, Quote, Comment, QuoteLike, CommentVote
+│   └── Service/          # AuthService, ValidationService, UploadService
+└── views/                # PHP-Templates (Tailwind CDN)
+```.text
+}
 
 Jede Schicht kennt nur die darunterliegende: Views enthalten kein SQL, Models enthalten keine HTTP-Logik. Der Router mappt Pfade und HTTP-Methoden auf Controller-Methoden und extrahiert Platzhalter wie `{id}`.
 
@@ -346,6 +323,8 @@ sequenceDiagram
 == Ablauf: Kommentar anlegen (CRUD Create)
 
 Das Erstellen eines Kommentars verdeutlicht die CRUD-Umsetzung für die Hauptressource. Der Controller prüft Login, CSRF und Validierung, bevor das Model den Datensatz einfügt.
+
+// TODO: Check if 200 should be 400 or similar, we should probably support error http codes
 
 ```pintora
 sequenceDiagram
@@ -452,7 +431,7 @@ Fehlerhafte Eingaben führen nicht zu stillschweigendem Verwerfen: Das Formular 
 
 == HTML, CSS und JavaScript
 
-Die Oberfläche besteht aus validem HTML5. Formatierungen erfolgen ausschließlich über CSS, konkret Tailwind CSS 4 per CDN im Layout-Template. Die Navigation führt Gäste zu Feed, Login und Registrierung, eingeloggte Nutzer zusätzlich zu Profil und Logout, Administratoren zu den Admin-Bereichen Benutzer und Zitate.
+Die Oberfläche besteht aus validem HTML5. Formatierungen erfolgen ausschließlich über CSS, konkret #link("https://tailwindcss.com/")[Tailwind CSS 4] per CDN im Layout-Template. Die Navigation führt Gäste zu Feed, Login und Registrierung, eingeloggte Nutzer zusätzlich zu Profil und Logout, Administratoren zu den Admin-Bereichen Benutzer und Zitate.
 
 JavaScript ist bewusst auf Transport- und Komfortfunktionen beschränkt. Die Datei `public/assets/js/app.js` sendet per Fetch API DELETE- und PATCH-Anfragen, übergibt CSRF-Token aus dem Meta-Tag und blendet Antwort-Formulare im Thread ein. Validierung, Berechtigungsprüfung und Escaping bleiben vollständig serverseitig, wie von der Projektangabe gefordert.
 
@@ -460,9 +439,36 @@ JavaScript ist bewusst auf Transport- und Komfortfunktionen beschränkt. Die Dat
 
 Zitate erscheinen im Feed als Karten mit Ausschnitt, Sprecher, optional Thumbnail, Kommentar- und Like-Zähler. Auf der Detailseite zeigt ein Hero-Bild (falls vorhanden) das vollständige Zitat. Kommentare werden rekursiv in `comment-tree.php` gerendert: Avatare links, Einrückung und Verbindungslinien visualisieren die Thread-Struktur. Sortierung ist sowohl im Feed (`?sort=`) als auch bei Kommentaren (`?csort=`) wählbar.
 
-#image(
-  
-)
+#block(image(
+  "assets/cercei-quote-with-image.png"
+), radius: 2mm, clip: true, height: 10cm)
+
+#block(image(
+  "assets/thread-display.png"
+), radius: 2mm, clip: true, height: 8cm)
+
+== Public Profile
+
+Öffentliche Profile zeigen den Namen, Avatar, Kommentar- und Like-Statistik. Sie sind bei allen Anwendern zugänglich und sind von Kommentaren aus navigierbar.
+
+#block(image(
+  "assets/public-profile-demo.png"
+), radius: 2mm, clip: true, height: 10cm)
+
+== Admin-Bereich
+
+Die Benutzerverwaltung zeigt tabellarisch alle Benutzer mit ID, Namen, Rolle, Registrierungsdatum und Aktionen. Hier ist es möglich, Benutzer zu löschen oder die Admin-Rolle zu ändern.
+
+
+#block(image(
+  "assets/user-management.png"
+), radius: 2mm, clip: true, height: 5.2cm)
+
+Die Zitatverwaltung ermöglicht das CRUD für Zitate. Auch hier gibt es eine übersichtliche Darstellung mittels Tabelle, die ID, Text, Sprecher, Thumbnail und Aktionen anzeigt. Alle CRUD-Operationen öffnen ein eigenes Formular, um das Zitat zu erstellen, zu bearbeiten oder anzusehen.
+
+#block(image(
+  "assets/quote-management.png"
+), radius: 2mm, clip: true, height: 6cm)
 
 = Testfälle
 
@@ -520,12 +526,12 @@ Zusätzlich zu den automatisierten Tests wurden Szenarien manuell geprüft. Dazu
       errors: 0,
       disabled: 0,
       testsuite: (
-        (name: "T-AUTH-01: Registrierung gültig → Erfolg, Redirect Login", status: "passed", time: [manuell]),
-        (name: "T-AUTH-02: Duplicate Username → Fehler", status: "passed", time: [manuell]),
-        (name: "T-AUTH-03: Passwort < 8 Zeichen → Fehler", status: "passed", time: [manuell]),
-        (name: "T-AUTH-04: Login korrekt → Session aktiv", status: "passed", time: [manuell]),
-        (name: "T-AUTH-05: Login falsch → generische Fehlermeldung", status: "passed", time: [manuell]),
-        (name: "T-AUTH-06: Logout → Session beendet", status: "passed", time: [manuell]),
+        (name: "Registrierung gültig → Erfolg, Redirect Login", status: "passed", time: [manuell]),
+        (name: "Duplicate Username → Fehler", status: "passed", time: [manuell]),
+        (name: "Passwort < 8 Zeichen → Fehler", status: "passed", time: [manuell]),
+        (name: "Login korrekt → Session aktiv", status: "passed", time: [manuell]),
+        (name: "Login falsch → generische Fehlermeldung", status: "passed", time: [manuell]),
+        (name: "Logout → Session beendet", status: "passed", time: [manuell]),
       ),
     ),
     (
@@ -535,15 +541,15 @@ Zusätzlich zu den automatisierten Tests wurden Szenarien manuell geprüft. Dazu
       errors: 0,
       disabled: 0,
       testsuite: (
-        (name: "T-QUOTE-01: Gast sieht Liste und Detail", status: "passed", time: [manuell]),
-        (name: "T-CMT-01: Gast sieht Kommentare, kein Formular", status: "passed", time: [manuell]),
-        (name: "T-CMT-02: User erstellt Kommentar mit Username", status: "passed", time: [manuell]),
-        (name: "T-CMT-03: User bearbeitet eigenen Kommentar", status: "passed", time: [manuell]),
-        (name: "T-CMT-04: User löscht eigenen Kommentar", status: "passed", time: [manuell]),
-        (name: "T-CMT-05: Fremdes Edit → 403", status: "passed", time: [manuell]),
-        (name: "T-CMT-06: Fremdes Delete → 403", status: "passed", time: [manuell]),
-        (name: "T-CMT-07: Leerer Kommentar → Validierungsfehler", status: "passed", time: [manuell]),
-        (name: "T-CMT-08: XSS-Payload → escaped in Ausgabe", status: "passed", time: [manuell]),
+        (name: "Gast sieht Liste und Detail", status: "passed", time: [manuell]),
+        (name: "Gast sieht Kommentare, kein Formular", status: "passed", time: [manuell]),
+        (name: "User erstellt Kommentar mit Username", status: "passed", time: [manuell]),
+        (name: "User bearbeitet eigenen Kommentar", status: "passed", time: [manuell]),
+        (name: "User löscht eigenen Kommentar", status: "passed", time: [manuell]),
+        (name: "Fremdes Edit → 403", status: "passed", time: [manuell]),
+        (name: "Fremdes Delete → 403", status: "passed", time: [manuell]),
+        (name: "Leerer Kommentar → Validierungsfehler", status: "passed", time: [manuell]),
+        (name: "XSS-Payload → escaped in Ausgabe", status: "passed", time: [manuell]),
       ),
     ),
     (
@@ -553,14 +559,14 @@ Zusätzlich zu den automatisierten Tests wurden Szenarien manuell geprüft. Dazu
       errors: 0,
       disabled: 0,
       testsuite: (
-        (name: "T-ADM-01: Admin löscht fremden Kommentar", status: "passed", time: [manuell]),
-        (name: "T-ADM-02: Admin kann fremden Kommentar nicht bearbeiten", status: "passed", time: [manuell]),
-        (name: "T-ADM-03: Admin togglet User-Rolle", status: "passed", time: [manuell]),
-        (name: "T-ADM-04: Admin löscht User → Kommentare zeigen <deleted>", status: "passed", time: [manuell]),
-        (name: "T-ADM-05: Nicht-Admin auf /admin → 403", status: "passed", time: [manuell]),
-        (name: "T-ADM-06: Letzter Admin nicht degradierbar", status: "passed", time: [manuell]),
-        (name: "T-ADM-07: Admin CRUD Zitate", status: "passed", time: [manuell]),
-        (name: "T-ADM-08: Admin kann eigene Rolle nicht entziehen", status: "passed", time: [manuell]),
+        (name: "Admin löscht fremden Kommentar", status: "passed", time: [manuell]),
+        (name: "Admin kann fremden Kommentar nicht bearbeiten", status: "passed", time: [manuell]),
+        (name: "Admin togglet User-Rolle", status: "passed", time: [manuell]),
+        (name: "Admin löscht User → Kommentare zeigen <deleted>", status: "passed", time: [manuell]),
+        (name: "Nicht-Admin auf /admin → 403", status: "passed", time: [manuell]),
+        (name: "Letzter Admin nicht degradierbar", status: "passed", time: [manuell]),
+        (name: "Admin CRUD Zitate", status: "passed", time: [manuell]),
+        (name: "Admin kann eigene Rolle nicht entziehen", status: "passed", time: [manuell]),
       ),
     ),
     (
@@ -570,12 +576,12 @@ Zusätzlich zu den automatisierten Tests wurden Szenarien manuell geprüft. Dazu
       errors: 0,
       disabled: 0,
       testsuite: (
-        (name: "T-FORUM-01: Feed-Sortierung top/trending", status: "passed", time: [manuell]),
-        (name: "T-FORUM-02: Zitat liken und entliken", status: "passed", time: [manuell]),
-        (name: "T-FORUM-03: Kommentar up-/downvoten", status: "passed", time: [manuell]),
-        (name: "T-FORUM-04: Kommentar-Sortierung auf Detailseite", status: "passed", time: [manuell]),
-        (name: "T-FORUM-05: Öffentliches Profil mit Kommentaren und Likes", status: "passed", time: [manuell]),
-        (name: "T-FORUM-06: Thread-Antworten und CASCADE-Löschung", status: "passed", time: [manuell]),
+        (name: "Feed-Sortierung top/trending", status: "passed", time: [manuell]),
+        (name: "Zitat liken und entliken", status: "passed", time: [manuell]),
+        (name: "Kommentar up-/downvoten", status: "passed", time: [manuell]),
+        (name: "Kommentar-Sortierung auf Detailseite", status: "passed", time: [manuell]),
+        (name: "Öffentliches Profil mit Kommentaren und Likes", status: "passed", time: [manuell]),
+        (name: "Thread-Antworten und CASCADE-Löschung", status: "passed", time: [manuell]),
       ),
     ),
     (
@@ -585,9 +591,9 @@ Zusätzlich zu den automatisierten Tests wurden Szenarien manuell geprüft. Dazu
       errors: 0,
       disabled: 0,
       testsuite: (
-        (name: "T-SEC-01: SQL-Injection Login → kein Bypass", status: "passed", time: [manuell]),
-        (name: "T-SEC-02: Direktaufruf fremdes Edit → 403", status: "passed", time: [manuell]),
-        (name: "T-SEC-03: Ungültige Quote-ID → 404", status: "passed", time: [manuell]),
+        (name: "SQL-Injection Login → kein Bypass", status: "passed", time: [manuell]),
+        (name: "Direktaufruf fremdes Edit → 403", status: "passed", time: [manuell]),
+        (name: "Ungültige Quote-ID → 404", status: "passed", time: [manuell]),
       ),
     ),
   ),

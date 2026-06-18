@@ -31,9 +31,9 @@ function commentSortUrl(int $quoteId, string $sort): string
 
 <article class="rounded-2xl border border-stone-800 bg-gradient-to-b from-stone-900/80 to-stone-950 overflow-hidden shadow-xl shadow-black/30 mb-10">
     <?php if (!empty($quote['image_path'])): ?>
-        <div class="aspect-[21/9] max-h-72 overflow-hidden">
+        <div class="flex justify-center bg-stone-950">
             <img src="<?= Html::e($quote['image_path']) ?>" alt=""
-                 class="w-full h-full object-cover">
+                 class="w-full max-h-96 object-contain">
         </div>
     <?php endif; ?>
     <div class="p-6 sm:p-10">
