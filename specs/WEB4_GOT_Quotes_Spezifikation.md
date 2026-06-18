@@ -157,7 +157,7 @@ Route-Bereich: `/admin/users`
 |---|---|
 | Ressourcen-URLs | Substantive, plural: `/quotes`, `/comments`, `/users` |
 | HTTP-Methoden semantisch | GET = lesen, POST = erstellen, PUT/PATCH = aktualisieren, DELETE = löschen |
-| Statuscodes | 200 OK, 201 Created, 204 No Content (DELETE), 302/303 Redirect (HTML-Flow), 403 Forbidden, 404 Not Found, 422 Unprocessable Entity (Validierung) |
+| Statuscodes | 200 OK, 201 Created, 204 No Content (DELETE), 302 Redirect (HTML-Flow), 401 Unauthorized (Login), 403 Forbidden, 404 Not Found, 405 Method Not Allowed, 422 Unprocessable Entity (Validierung) |
 | Keine Aktion in URL | ~~`/comments/{id}/delete`~~ → `DELETE /comments/{id}` |
 | Content-Negotiation (optional) | `Accept: application/json` → JSON-Antwort; Standard: HTML |
 
@@ -402,7 +402,8 @@ Unique: `(comment_id, user_id)`.
 ### 9.2 Fehlerdarstellung
 
 - Validierungsfehler am Formular / Flash-Message
-- HTTP 422 bei API-JSON; HTML-Flow mit Redirect + Flash
+- HTTP 422 bei Validierungsfehlern (Formular erneut); HTTP 401 bei fehlgeschlagenem Login
+- Ungültiges CSRF → HTTP 403
 - Keine Stack Traces in Abgabe
 
 ### 9.3 Sicherheitscheckliste

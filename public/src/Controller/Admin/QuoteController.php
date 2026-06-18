@@ -155,12 +155,11 @@ final class QuoteController
 
         // If there are validation or upload errors, re-render the form
         if ($errors !== []) {
-            View::render($view, [
+            Response::unprocessable($view, [
                 'title' => $title,
                 'quote' => $quoteId === null ? $data : array_merge($existing, $data),
                 'errors' => $errors,
             ]);
-            return;
         }
 
         // Commit the create or update, depending on whether it's a new quote or editing

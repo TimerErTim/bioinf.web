@@ -56,8 +56,7 @@ final class Router
         }
 
         // No matching route found
-        http_response_code(404);
-        View::render('errors/404', ['title' => 'Nicht gefunden']);
+        Response::notFound();
     }
 
     private function add(string $method, string $pattern, callable $handler): void

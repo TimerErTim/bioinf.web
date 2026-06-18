@@ -6,18 +6,30 @@ namespace App;
 
 final class Response
 {
+    public static function render(string $view, array $data = [], int $status = 200, ?string $layout = 'layouts/main'): void
+    {
+        View::render($view, $data, $layout, $status);
+        exit;
+    }
+
+    public static function unauthorized(string $view, array $data = [], ?string $layout = 'layouts/main'): void
+    {
+        self::render($view, $data, 401, $layout);
+    }
+
+    public static function unprocessable(string $view, array $data = [], ?string $layout = 'layouts/main'): void
+    {
+        self::render($view, $data, 422, $layout);
+    }
+
     public static function forbidden(): void
     {
-        http_response_code(403);
-        View::render('errors/403', ['title' => 'Kein Zugriff']);
-        exit;
+        self::render('errors/403', ['title' => 'Kein Zugriff'], 403);
     }
 
     public static function notFound(): void
     {
-        http_response_code(404);
-        View::render('errors/404', ['title' => 'Nicht gefunden']);
-        exit;
+        self::render('errors/404', ['title' => 'Nicht gefunden'], 404);
     }
 
     public static function methodNotAllowed(): void
@@ -51,8 +63,7 @@ final class Response
         $token = $_POST['_csrf'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
 
         if (!Csrf::validate(is_string($token) ? $token : null)) {
-            Flash::error('Sicherheits-Token ungültig. Bitte nochmal versuchen.');
-            View::redirect('/');
+            self::forbidden();
         }
     }
 
@@ -67,8 +78,8 @@ final class Response
 
         // Only redirect to referer if it's present and matches this host
         if (is_string($referer) && $referer !== '' && $host !== '' && str_contains($referer, $host)) {
-            header('Location: ' . $referer);
-            exit;
+            View::redirect($referer);
+            return;
         }
 
         View::redirect($fallback);

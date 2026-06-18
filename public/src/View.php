@@ -6,8 +6,12 @@ namespace App;
 
 final class View
 {
-    public static function render(string $view, array $data = [], ?string $layout = 'layouts/main'): void
+    public static function render(string $view, array $data = [], ?string $layout = 'layouts/main', ?int $status = null): void
     {
+        if ($status !== null) {
+            http_response_code($status);
+        }
+
         // Populate local variables from the $data array, but don't overwrite existing ones
         extract($data, EXTR_SKIP);
 
@@ -37,8 +41,9 @@ final class View
         return (string) ob_get_clean();
     }
 
-    public static function redirect(string $path): void
+    public static function redirect(string $path, int $status = 302): void
     {
+        http_response_code($status);
         header('Location: ' . $path);
         exit;
     }

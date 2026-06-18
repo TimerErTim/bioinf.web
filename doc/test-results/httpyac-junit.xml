@@ -1,379 +1,378 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="httpyac" tests="47" errors="0" disabled="0" failures="0" time="5.355">
-  <testsuite name="pubFeed" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\01-public.rest" time="0.112">
+<testsuites name="httpyac" tests="46" errors="0" disabled="0" failures="0" time="4.205">
+  <testsuite name="pubFeed" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/01-public.rest" time="0.122">
     <properties>
       <property name="line" value="4"/>
-      <property name="timestamp" value="2026-06-17T18:48:33.843Z"/>
-      <property name="file" value="\tests\rest\01-public.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:30.810Z"/>
+      <property name="file" value="tests/rest/01-public.rest"/>
     </properties>
-    <testcase name="status == 200" classname="pubFeed" time="0.056" assertions="1"/>
-    <testcase name="body contains Zitate" classname="pubFeed" time="0.056" assertions="1"/>
+    <testcase name="status == 200" classname="pubFeed" time="0.061" assertions="1"/>
+    <testcase name="body contains Zitate" classname="pubFeed" time="0.061" assertions="1"/>
   </testsuite>
-  <testsuite name="pubQuoteDetail" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\01-public.rest" time="0.075">
+  <testsuite name="pubQuoteDetail" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/01-public.rest" time="0.083">
     <properties>
       <property name="line" value="11"/>
-      <property name="timestamp" value="2026-06-17T18:48:33.955Z"/>
-      <property name="file" value="\tests\rest\01-public.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:30.933Z"/>
+      <property name="file" value="tests/rest/01-public.rest"/>
     </properties>
-    <testcase name="status == 200" classname="pubQuoteDetail" time="0.037" assertions="1"/>
-    <testcase name="body contains Cersei Lannister" classname="pubQuoteDetail" time="0.037" assertions="1"/>
+    <testcase name="status == 200" classname="pubQuoteDetail" time="0.042" assertions="1"/>
+    <testcase name="body contains Cersei Lannister" classname="pubQuoteDetail" time="0.042" assertions="1"/>
   </testsuite>
-  <testsuite name="pubQuote404" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\01-public.rest" time="0.060">
+  <testsuite name="pubQuote404" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/01-public.rest" time="0.075">
     <properties>
       <property name="line" value="18"/>
-      <property name="timestamp" value="2026-06-17T18:48:34.030Z"/>
-      <property name="file" value="\tests\rest\01-public.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.017Z"/>
+      <property name="file" value="tests/rest/01-public.rest"/>
     </properties>
-    <testcase name="status == 404" classname="pubQuote404" time="0.060" assertions="1"/>
+    <testcase name="status == 404" classname="pubQuote404" time="0.075" assertions="1"/>
   </testsuite>
-  <testsuite name="pubProfile" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\01-public.rest" time="0.133">
+  <testsuite name="pubProfile" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/01-public.rest" time="0.085">
     <properties>
       <property name="line" value="24"/>
-      <property name="timestamp" value="2026-06-17T18:48:34.091Z"/>
-      <property name="file" value="\tests\rest\01-public.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.093Z"/>
+      <property name="file" value="tests/rest/01-public.rest"/>
     </properties>
-    <testcase name="status == 200" classname="pubProfile" time="0.067" assertions="1"/>
-    <testcase name="body contains tyrion_fan" classname="pubProfile" time="0.067" assertions="1"/>
+    <testcase name="status == 200" classname="pubProfile" time="0.042" assertions="1"/>
+    <testcase name="body contains tyrion_fan" classname="pubProfile" time="0.042" assertions="1"/>
   </testsuite>
-  <testsuite name="pubSortTop" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\01-public.rest" time="0.064">
+  <testsuite name="pubSortTop" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/01-public.rest" time="0.060">
     <properties>
       <property name="line" value="31"/>
-      <property name="timestamp" value="2026-06-17T18:48:34.224Z"/>
-      <property name="file" value="\tests\rest\01-public.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.178Z"/>
+      <property name="file" value="tests/rest/01-public.rest"/>
     </properties>
-    <testcase name="status == 200" classname="pubSortTop" time="0.032" assertions="1"/>
-    <testcase name="body contains sort=top" classname="pubSortTop" time="0.032" assertions="1"/>
+    <testcase name="status == 200" classname="pubSortTop" time="0.030" assertions="1"/>
+    <testcase name="body contains sort=top" classname="pubSortTop" time="0.030" assertions="1"/>
   </testsuite>
-  <testsuite name="pubCommentSort" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\01-public.rest" time="0.091">
+  <testsuite name="pubCommentSort" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/01-public.rest" time="0.071">
     <properties>
       <property name="line" value="38"/>
-      <property name="timestamp" value="2026-06-17T18:48:34.289Z"/>
-      <property name="file" value="\tests\rest\01-public.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.239Z"/>
+      <property name="file" value="tests/rest/01-public.rest"/>
     </properties>
-    <testcase name="status == 200" classname="pubCommentSort" time="0.091" assertions="1"/>
+    <testcase name="status == 200" classname="pubCommentSort" time="0.071" assertions="1"/>
   </testsuite>
-  <testsuite name="pubAdminForbidden" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\01-public.rest" time="0.063">
+  <testsuite name="pubAdminForbidden" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/01-public.rest" time="0.045">
     <properties>
       <property name="line" value="44"/>
-      <property name="timestamp" value="2026-06-17T18:48:34.381Z"/>
-      <property name="file" value="\tests\rest\01-public.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.310Z"/>
+      <property name="file" value="tests/rest/01-public.rest"/>
     </properties>
-    <testcase name="status == 403" classname="pubAdminForbidden" time="0.063" assertions="1"/>
+    <testcase name="status == 403" classname="pubAdminForbidden" time="0.045" assertions="1"/>
   </testsuite>
-  <testsuite name="authLoginForm" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\02-auth.rest" time="0.078">
+  <testsuite name="authLoginForm" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/02-auth.rest" time="0.042">
     <properties>
       <property name="line" value="4"/>
-      <property name="timestamp" value="2026-06-17T18:48:34.467Z"/>
-      <property name="file" value="\tests\rest\02-auth.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.411Z"/>
+      <property name="file" value="tests/rest/02-auth.rest"/>
     </properties>
-    <testcase name="status == 200" classname="authLoginForm" time="0.039" assertions="1"/>
-    <testcase name="body contains Einloggen" classname="authLoginForm" time="0.039" assertions="1"/>
+    <testcase name="status == 200" classname="authLoginForm" time="0.021" assertions="1"/>
+    <testcase name="body contains Einloggen" classname="authLoginForm" time="0.021" assertions="1"/>
   </testsuite>
-  <testsuite name="authLoginPage" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\02-auth.rest" time="0.060">
+  <testsuite name="authLoginPage" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/02-auth.rest" time="0.056">
     <properties>
       <property name="line" value="11"/>
-      <property name="timestamp" value="2026-06-17T18:48:34.545Z"/>
-      <property name="file" value="\tests\rest\02-auth.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.453Z"/>
+      <property name="file" value="tests/rest/02-auth.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="authLoginOk" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\02-auth.rest" time="0.240">
+  <testsuite name="authLoginOk" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/02-auth.rest" time="0.262">
     <properties>
       <property name="line" value="19"/>
-      <property name="timestamp" value="2026-06-17T18:48:34.606Z"/>
-      <property name="file" value="\tests\rest\02-auth.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.511Z"/>
+      <property name="file" value="tests/rest/02-auth.rest"/>
     </properties>
-    <testcase name="status == 302" classname="authLoginOk" time="0.120" assertions="1"/>
-    <testcase name="location == /" classname="authLoginOk" time="0.120" assertions="1"/>
+    <testcase name="status == 302" classname="authLoginOk" time="0.131" assertions="1"/>
+    <testcase name="location == /" classname="authLoginOk" time="0.131" assertions="1"/>
   </testsuite>
-  <testsuite name="authSessionCheck" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\02-auth.rest" time="0.127">
+  <testsuite name="authSessionCheck" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/02-auth.rest" time="0.130">
     <properties>
       <property name="line" value="30"/>
-      <property name="timestamp" value="2026-06-17T18:48:34.847Z"/>
-      <property name="file" value="\tests\rest\02-auth.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.772Z"/>
+      <property name="file" value="tests/rest/02-auth.rest"/>
     </properties>
-    <testcase name="status == 200" classname="authSessionCheck" time="0.064" assertions="1"/>
-    <testcase name="body contains tyrion_fan" classname="authSessionCheck" time="0.064" assertions="1"/>
+    <testcase name="status == 200" classname="authSessionCheck" time="0.065" assertions="1"/>
+    <testcase name="body contains tyrion_fan" classname="authSessionCheck" time="0.065" assertions="1"/>
   </testsuite>
-  <testsuite name="authLogout" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\02-auth.rest" time="0.069">
+  <testsuite name="authLogout" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/02-auth.rest" time="0.058">
     <properties>
       <property name="line" value="41"/>
-      <property name="timestamp" value="2026-06-17T18:48:34.975Z"/>
-      <property name="file" value="\tests\rest\02-auth.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.903Z"/>
+      <property name="file" value="tests/rest/02-auth.rest"/>
     </properties>
-    <testcase name="status == 302" classname="authLogout" time="0.069" assertions="1"/>
+    <testcase name="status == 302" classname="authLogout" time="0.058" assertions="1"/>
   </testsuite>
-  <testsuite name="authProfileRedirect" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\02-auth.rest" time="0.074">
+  <testsuite name="authProfileRedirect" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/02-auth.rest" time="0.059">
     <properties>
       <property name="line" value="49"/>
-      <property name="timestamp" value="2026-06-17T18:48:35.044Z"/>
-      <property name="file" value="\tests\rest\02-auth.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:31.962Z"/>
+      <property name="file" value="tests/rest/02-auth.rest"/>
     </properties>
-    <testcase name="status == 302" classname="authProfileRedirect" time="0.037" assertions="1"/>
-    <testcase name="location == /login" classname="authProfileRedirect" time="0.037" assertions="1"/>
+    <testcase name="status == 302" classname="authProfileRedirect" time="0.029" assertions="1"/>
+    <testcase name="location == /login" classname="authProfileRedirect" time="0.029" assertions="1"/>
   </testsuite>
-  <testsuite name="authBadLoginPage" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\02-auth.rest" time="0.070">
+  <testsuite name="authBadLoginPage" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/02-auth.rest" time="0.080">
     <properties>
       <property name="line" value="57"/>
-      <property name="timestamp" value="2026-06-17T18:48:35.119Z"/>
-      <property name="file" value="\tests\rest\02-auth.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:32.021Z"/>
+      <property name="file" value="tests/rest/02-auth.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="authLoginFail" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\02-auth.rest" time="0.281">
+  <testsuite name="authLoginFail" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/02-auth.rest" time="0.197">
     <properties>
       <property name="line" value="65"/>
-      <property name="timestamp" value="2026-06-17T18:48:35.189Z"/>
-      <property name="file" value="\tests\rest\02-auth.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:32.102Z"/>
+      <property name="file" value="tests/rest/02-auth.rest"/>
     </properties>
-    <testcase name="status == 200" classname="authLoginFail" time="0.140" assertions="1"/>
-    <testcase name="body contains ungültig" classname="authLoginFail" time="0.140" assertions="1"/>
+    <testcase name="status == 401" classname="authLoginFail" time="0.099" assertions="1"/>
+    <testcase name="body contains ungültig" classname="authLoginFail" time="0.099" assertions="1"/>
   </testsuite>
-  <testsuite name="cmtLoginPage" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.042">
+  <testsuite name="cmtLoginPage" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.040">
     <properties>
       <property name="line" value="4"/>
-      <property name="timestamp" value="2026-06-17T18:48:35.488Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:32.347Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="cmtLoginOk" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.315">
+  <testsuite name="cmtLoginOk" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.289">
     <properties>
       <property name="line" value="12"/>
-      <property name="timestamp" value="2026-06-17T18:48:35.530Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:32.387Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="cmtHome" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.124">
+  <testsuite name="cmtHome" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.058">
     <properties>
       <property name="line" value="19"/>
-      <property name="timestamp" value="2026-06-17T18:48:35.846Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:32.676Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="cmtCreate" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.076">
+  <testsuite name="cmtCreate" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.065">
     <properties>
       <property name="line" value="27"/>
-      <property name="timestamp" value="2026-06-17T18:48:35.971Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:32.735Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
-    <testcase name="status == 302" classname="cmtCreate" time="0.076" assertions="1"/>
+    <testcase name="status == 302" classname="cmtCreate" time="0.065" assertions="1"/>
   </testsuite>
-  <testsuite name="cmtShow" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.122">
+  <testsuite name="cmtShow" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.073">
     <properties>
       <property name="line" value="38"/>
-      <property name="timestamp" value="2026-06-17T18:48:36.047Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:32.800Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
-    <testcase name="status == 200" classname="cmtShow" time="0.061" assertions="1"/>
-    <testcase name="body contains Automatisierter REST-Test" classname="cmtShow" time="0.061" assertions="1"/>
+    <testcase name="status == 200" classname="cmtShow" time="0.036" assertions="1"/>
+    <testcase name="body contains Automatisierter REST-Test" classname="cmtShow" time="0.036" assertions="1"/>
   </testsuite>
-  <testsuite name="cmtForbiddenEdit" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.074">
+  <testsuite name="cmtForbiddenEdit" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.064">
     <properties>
       <property name="line" value="45"/>
-      <property name="timestamp" value="2026-06-17T18:48:36.170Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:32.873Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
-    <testcase name="status == 403" classname="cmtForbiddenEdit" time="0.074" assertions="1"/>
+    <testcase name="status == 403" classname="cmtForbiddenEdit" time="0.064" assertions="1"/>
   </testsuite>
-  <testsuite name="cmtEditForm" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.090">
+  <testsuite name="cmtEditForm" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.049">
     <properties>
       <property name="line" value="52"/>
-      <property name="timestamp" value="2026-06-17T18:48:36.244Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:32.937Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
-    <testcase name="status == 200" classname="cmtEditForm" time="0.045" assertions="1"/>
-    <testcase name="body contains Kommentar bearbeiten" classname="cmtEditForm" time="0.045" assertions="1"/>
+    <testcase name="status == 200" classname="cmtEditForm" time="0.024" assertions="1"/>
+    <testcase name="body contains Kommentar bearbeiten" classname="cmtEditForm" time="0.024" assertions="1"/>
   </testsuite>
-  <testsuite name="cmtUpdate" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.085">
+  <testsuite name="cmtUpdate" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.074">
     <properties>
       <property name="line" value="63"/>
-      <property name="timestamp" value="2026-06-17T18:48:36.334Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:32.986Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
-    <testcase name="status == 302" classname="cmtUpdate" time="0.085" assertions="1"/>
+    <testcase name="status == 302" classname="cmtUpdate" time="0.074" assertions="1"/>
   </testsuite>
-  <testsuite name="cmtUpdated" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.114">
+  <testsuite name="cmtUpdated" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.071">
     <properties>
       <property name="line" value="73"/>
-      <property name="timestamp" value="2026-06-17T18:48:36.420Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:33.060Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
-    <testcase name="status == 200" classname="cmtUpdated" time="0.057" assertions="1"/>
-    <testcase name="body contains REST updated" classname="cmtUpdated" time="0.057" assertions="1"/>
+    <testcase name="status == 200" classname="cmtUpdated" time="0.035" assertions="1"/>
+    <testcase name="body contains REST updated" classname="cmtUpdated" time="0.035" assertions="1"/>
   </testsuite>
-  <testsuite name="cmtQuotePage" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.087">
+  <testsuite name="cmtQuotePage" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.066">
     <properties>
       <property name="line" value="80"/>
-      <property name="timestamp" value="2026-06-17T18:48:36.535Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:33.131Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="cmtEmptyRejected" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\03-comments.rest" time="0.121">
+  <testsuite name="cmtEmptyRejected" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/03-comments.rest" time="0.071">
     <properties>
       <property name="line" value="88"/>
-      <property name="timestamp" value="2026-06-17T18:48:36.622Z"/>
-      <property name="file" value="\tests\rest\03-comments.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:33.198Z"/>
+      <property name="file" value="tests/rest/03-comments.rest"/>
     </properties>
-    <testcase name="status == 200" classname="cmtEmptyRejected" time="0.060" assertions="1"/>
-    <testcase name="body contains darf nicht leer" classname="cmtEmptyRejected" time="0.060" assertions="1"/>
+    <testcase name="status == 422" classname="cmtEmptyRejected" time="0.036" assertions="1"/>
+    <testcase name="body contains darf nicht leer" classname="cmtEmptyRejected" time="0.036" assertions="1"/>
   </testsuite>
-  <testsuite name="admLoginPage" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\04-admin.rest" time="0.141">
+  <testsuite name="admLoginPage" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/04-admin.rest" time="0.091">
     <properties>
       <property name="line" value="4"/>
-      <property name="timestamp" value="2026-06-17T18:48:36.806Z"/>
-      <property name="file" value="\tests\rest\04-admin.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:33.330Z"/>
+      <property name="file" value="tests/rest/04-admin.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="admLoginOk" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\04-admin.rest" time="0.362">
+  <testsuite name="admLoginOk" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/04-admin.rest" time="0.256">
     <properties>
       <property name="line" value="12"/>
-      <property name="timestamp" value="2026-06-17T18:48:36.948Z"/>
-      <property name="file" value="\tests\rest\04-admin.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:33.421Z"/>
+      <property name="file" value="tests/rest/04-admin.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="admUserList" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\04-admin.rest" time="0.101">
+  <testsuite name="admUserList" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/04-admin.rest" time="0.056">
     <properties>
       <property name="line" value="19"/>
-      <property name="timestamp" value="2026-06-17T18:48:37.311Z"/>
-      <property name="file" value="\tests\rest\04-admin.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:33.677Z"/>
+      <property name="file" value="tests/rest/04-admin.rest"/>
     </properties>
-    <testcase name="status == 200" classname="admUserList" time="0.051" assertions="1"/>
-    <testcase name="body contains Benutzer" classname="admUserList" time="0.051" assertions="1"/>
+    <testcase name="status == 200" classname="admUserList" time="0.028" assertions="1"/>
+    <testcase name="body contains Benutzer" classname="admUserList" time="0.028" assertions="1"/>
   </testsuite>
-  <testsuite name="admQuoteList" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\04-admin.rest" time="0.083">
+  <testsuite name="admQuoteList" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/04-admin.rest" time="0.054">
     <properties>
       <property name="line" value="26"/>
-      <property name="timestamp" value="2026-06-17T18:48:37.412Z"/>
-      <property name="file" value="\tests\rest\04-admin.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:33.732Z"/>
+      <property name="file" value="tests/rest/04-admin.rest"/>
     </properties>
-    <testcase name="status == 200" classname="admQuoteList" time="0.042" assertions="1"/>
-    <testcase name="body contains Zitate" classname="admQuoteList" time="0.042" assertions="1"/>
+    <testcase name="status == 200" classname="admQuoteList" time="0.027" assertions="1"/>
+    <testcase name="body contains Zitate" classname="admQuoteList" time="0.027" assertions="1"/>
   </testsuite>
-  <testsuite name="admQuoteNewForm" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\04-admin.rest" time="0.075">
+  <testsuite name="admQuoteNewForm" tests="2" errors="0" failures="0" skipped="0" package="tests/rest/04-admin.rest" time="0.054">
     <properties>
       <property name="line" value="33"/>
-      <property name="timestamp" value="2026-06-17T18:48:37.496Z"/>
-      <property name="file" value="\tests\rest\04-admin.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:33.786Z"/>
+      <property name="file" value="tests/rest/04-admin.rest"/>
     </properties>
-    <testcase name="status == 200" classname="admQuoteNewForm" time="0.037" assertions="1"/>
-    <testcase name="body contains Anlegen" classname="admQuoteNewForm" time="0.037" assertions="1"/>
+    <testcase name="status == 200" classname="admQuoteNewForm" time="0.027" assertions="1"/>
+    <testcase name="body contains Anlegen" classname="admQuoteNewForm" time="0.027" assertions="1"/>
   </testsuite>
-  <testsuite name="admUserLoginPage" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\04-admin.rest" time="0.142">
+  <testsuite name="admUserLoginPage" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/04-admin.rest" time="0.093">
     <properties>
       <property name="line" value="40"/>
-      <property name="timestamp" value="2026-06-17T18:48:37.571Z"/>
-      <property name="file" value="\tests\rest\04-admin.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:33.840Z"/>
+      <property name="file" value="tests/rest/04-admin.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="admUserLoginOk" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\04-admin.rest" time="0.231">
+  <testsuite name="admUserLoginOk" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/04-admin.rest" time="0.194">
     <properties>
       <property name="line" value="48"/>
-      <property name="timestamp" value="2026-06-17T18:48:37.714Z"/>
-      <property name="file" value="\tests\rest\04-admin.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:33.934Z"/>
+      <property name="file" value="tests/rest/04-admin.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="admUserForbidden" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\04-admin.rest" time="0.053">
+  <testsuite name="admUserForbidden" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/04-admin.rest" time="0.045">
     <properties>
       <property name="line" value="55"/>
-      <property name="timestamp" value="2026-06-17T18:48:37.945Z"/>
-      <property name="file" value="\tests\rest\04-admin.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:34.128Z"/>
+      <property name="file" value="tests/rest/04-admin.rest"/>
     </properties>
-    <testcase name="status == 403" classname="admUserForbidden" time="0.053" assertions="1"/>
+    <testcase name="status == 403" classname="admUserForbidden" time="0.045" assertions="1"/>
   </testsuite>
-  <testsuite name="forumLoginPage" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.153">
+  <testsuite name="forumLoginPage" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.089">
     <properties>
       <property name="line" value="4"/>
-      <property name="timestamp" value="2026-06-17T18:48:38.020Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:34.237Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="forumLoginOk" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.243">
+  <testsuite name="forumLoginOk" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.205">
     <properties>
       <property name="line" value="12"/>
-      <property name="timestamp" value="2026-06-17T18:48:38.173Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:34.326Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="forumQuoteLike" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.100">
+  <testsuite name="forumQuoteLike" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.068">
     <properties>
       <property name="line" value="19"/>
-      <property name="timestamp" value="2026-06-17T18:48:38.417Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:34.531Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="forumLike" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.087">
+  <testsuite name="forumLike" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.062">
     <properties>
       <property name="line" value="27"/>
-      <property name="timestamp" value="2026-06-17T18:48:38.517Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:34.599Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
-    <testcase name="status == 302" classname="forumLike" time="0.087" assertions="1"/>
+    <testcase name="status == 302" classname="forumLike" time="0.062" assertions="1"/>
   </testsuite>
-  <testsuite name="forumQuoteUnlike" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.119">
+  <testsuite name="forumQuoteUnlike" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.083">
     <properties>
       <property name="line" value="35"/>
-      <property name="timestamp" value="2026-06-17T18:48:38.605Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:34.661Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="forumUnlike" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.071">
+  <testsuite name="forumUnlike" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.093">
     <properties>
       <property name="line" value="43"/>
-      <property name="timestamp" value="2026-06-17T18:48:38.725Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:34.744Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
-    <testcase name="status == 302" classname="forumUnlike" time="0.071" assertions="1"/>
+    <testcase name="status == 302" classname="forumUnlike" time="0.093" assertions="1"/>
   </testsuite>
-  <testsuite name="forumQuoteVote" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.078">
+  <testsuite name="forumQuoteVote" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.070">
     <properties>
       <property name="line" value="51"/>
-      <property name="timestamp" value="2026-06-17T18:48:38.797Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:34.837Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="forumUpvote" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.068">
+  <testsuite name="forumUpvote" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.064">
     <properties>
       <property name="line" value="59"/>
-      <property name="timestamp" value="2026-06-17T18:48:38.876Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:34.908Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
-    <testcase name="status == 302" classname="forumUpvote" time="0.068" assertions="1"/>
+    <testcase name="status == 302" classname="forumUpvote" time="0.064" assertions="1"/>
   </testsuite>
-  <testsuite name="forumQuoteRemoveVote" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.097">
+  <testsuite name="forumQuoteRemoveVote" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.059">
     <properties>
       <property name="line" value="70"/>
-      <property name="timestamp" value="2026-06-17T18:48:38.945Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:34.972Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="forumRemoveVote" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.072">
+  <testsuite name="forumRemoveVote" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.059">
     <properties>
       <property name="line" value="78"/>
-      <property name="timestamp" value="2026-06-17T18:48:39.043Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:35.032Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
-    <testcase name="status == 302" classname="forumRemoveVote" time="0.072" assertions="1"/>
+    <testcase name="status == 302" classname="forumRemoveVote" time="0.059" assertions="1"/>
   </testsuite>
-  <testsuite name="forumDeleteNoCsrf" tests="2" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.070">
+  <testsuite name="forumDeleteNoCsrf" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.053">
     <properties>
       <property name="line" value="86"/>
-      <property name="timestamp" value="2026-06-17T18:48:39.115Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="timestamp" value="2026-06-18T08:42:35.092Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
-    <testcase name="status == 302" classname="forumDeleteNoCsrf" time="0.035" assertions="1"/>
-    <testcase name="location == /" classname="forumDeleteNoCsrf" time="0.035" assertions="1"/>
+    <testcase name="status == 403" classname="forumDeleteNoCsrf" time="0.053" assertions="1"/>
   </testsuite>
-  <testsuite name="forumHomeBadLike" tests="0" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.098">
+  <testsuite name="forumHomeBadLike" tests="0" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.061">
     <properties>
-      <property name="line" value="94"/>
-      <property name="timestamp" value="2026-06-17T18:48:39.186Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="line" value="93"/>
+      <property name="timestamp" value="2026-06-18T08:42:35.145Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
   </testsuite>
-  <testsuite name="forumBadLike" tests="1" errors="0" failures="0" skipped="0" package="\tests\rest\05-forum.rest" time="0.062">
+  <testsuite name="forumBadLike" tests="1" errors="0" failures="0" skipped="0" package="tests/rest/05-forum.rest" time="0.052">
     <properties>
-      <property name="line" value="102"/>
-      <property name="timestamp" value="2026-06-17T18:48:39.285Z"/>
-      <property name="file" value="\tests\rest\05-forum.rest"/>
+      <property name="line" value="101"/>
+      <property name="timestamp" value="2026-06-18T08:42:35.207Z"/>
+      <property name="file" value="tests/rest/05-forum.rest"/>
     </properties>
-    <testcase name="status == 404" classname="forumBadLike" time="0.062" assertions="1"/>
+    <testcase name="status == 404" classname="forumBadLike" time="0.052" assertions="1"/>
   </testsuite>
 </testsuites>

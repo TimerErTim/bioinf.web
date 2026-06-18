@@ -88,8 +88,7 @@ X-CSRF-Token: {{removeVoteCsrf}}
 # @name forumDeleteNoCsrf
 DELETE {{host}}/comments/1
 
-?? status == 302
-?? header location == /
+?? status == 403
 
 ###
 # @name forumHomeBadLike

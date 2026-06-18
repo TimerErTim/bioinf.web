@@ -74,12 +74,11 @@ final class AuthController
             if ($avatarPath !== null) {
                 UploadService::deleteFile($avatarPath);
             }
-            View::render('auth/register', [
+            Response::unprocessable('auth/register', [
                 'title' => 'Registrierung',
                 'username' => $username,
                 'errors' => $errors,
             ]);
-            return;
         }
 
         $this->users->create($username, password_hash($password, PASSWORD_DEFAULT), false, $avatarPath);
@@ -111,12 +110,11 @@ final class AuthController
         $user = $this->users->findByUsername($username);
         // Only valid user/password combinations allowed; otherwise, fail without revealing specifics
         if ($user === null || !$this->users->verifyPassword($user, $password)) {
-            View::render('auth/login', [
+            Response::unauthorized('auth/login', [
                 'title' => 'Login',
                 'username' => $username,
                 'errors' => ['Benutzername oder Passwort ungültig.'],
             ]);
-            return;
         }
 
         AuthService::login(

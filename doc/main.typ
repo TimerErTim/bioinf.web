@@ -311,20 +311,22 @@ sequenceDiagram
   Browser->>Router: POST /login (username, password, _csrf)
   Router->>AuthController: login()
   AuthController->>AuthController: CSRF prüfen
-  AuthController->>MySQL: SELECT user (Prepared Statement)
-  alt Zugangsdaten gültig
-    AuthController->>AuthController: session_regenerate_id()
-    AuthController->>Browser: 302 Redirect /
-  else ungültig
-    AuthController->>Browser: 200 Formular mit Fehlermeldung
+  alt CSRF ungültig
+    AuthController->>Browser: 403 Forbidden
+  else CSRF gültig
+    AuthController->>MySQL: SELECT user (Prepared Statement)
+    alt Zugangsdaten gültig
+      AuthController->>AuthController: session_regenerate_id()
+      AuthController->>Browser: 302 Redirect /
+    else ungültig
+      AuthController->>Browser: 401 Unauthorized + Login-Formular
+    end
   end
 ```
 
 == Ablauf: Kommentar anlegen (CRUD Create)
 
-Das Erstellen eines Kommentars verdeutlicht die CRUD-Umsetzung für die Hauptressource. Der Controller prüft Login, CSRF und Validierung, bevor das Model den Datensatz einfügt.
-
-// TODO: Check if 200 should be 400 or similar, we should probably support error http codes
+Das Erstellen eines Kommentars verdeutlicht die CRUD-Umsetzung für die Hauptressource. Der Controller prüft Login, CSRF und Validierung, bevor das Model den Datensatz einfügt. Fehlerhafte Eingaben liefern semantisch passende Statuscodes (401, 403, 422).
 
 ```pintora
 sequenceDiagram
@@ -334,13 +336,19 @@ sequenceDiagram
   participant [<database> CommentModel] as "Comment Model"
 
   Browser->>CommentController: POST /quotes/{id}/comments
-  CommentController->>CommentController: requireLogin(), CSRF
-  CommentController->>ValidationService: validate content
-  alt Inhalt leer oder zu lang
-    CommentController->>Browser: 200 Formular mit Fehler
-  else gültig
-    CommentController->>CommentModel: INSERT (Prepared Statement)
-    CommentController->>Browser: 302 Redirect /quotes/{id}
+  CommentController->>CommentController: CSRF prüfen, requireLogin()
+  alt CSRF ungültig
+    CommentController->>Browser: 403 Forbidden
+  else nicht eingeloggt
+    CommentController->>Browser: 401 Unauthorized
+  else Session und CSRF gültig
+    CommentController->>ValidationService: validate content
+    alt Inhalt leer oder zu lang
+      CommentController->>Browser: 422 Unprocessable Entity + Formular
+    else gültig
+      CommentController->>CommentModel: INSERT (Prepared Statement)
+      CommentController->>Browser: 302 Redirect /quotes/{id}
+    end
   end
 ```
 
@@ -357,12 +365,19 @@ sequenceDiagram
 
   Browser->>AppJs: Klick Löschen (bestätigt)
   AppJs->>CommentController: DELETE /comments/{id} + CSRF-Header
-  CommentController->>CommentController: Berechtigung (Autor oder Admin)
-  alt berechtigt
-    CommentController->>CommentModel: DELETE (CASCADE auf Replies)
-    CommentController->>Browser: 302 Redirect
-  else nicht berechtigt
+  CommentController->>CommentController: CSRF prüfen, requireLogin()
+  alt CSRF ungültig
     CommentController->>Browser: 403 Forbidden
+  else nicht eingeloggt
+    CommentController->>Browser: 401 Unauthorized
+  else Session und CSRF gültig
+    CommentController->>CommentController: Berechtigung (Autor oder Admin)
+    alt berechtigt
+      CommentController->>CommentModel: DELETE (CASCADE auf Replies)
+      CommentController->>Browser: 302 Redirect
+    else nicht berechtigt
+      CommentController->>Browser: 403 Forbidden
+    end
   end
 ```
 
@@ -468,7 +483,7 @@ Die Zitatverwaltung ermöglicht das CRUD für Zitate. Auch hier gibt es eine üb
 
 #block(image(
   "assets/quote-management.png"
-), radius: 2mm, clip: true, height: 6cm)
+), radius: 2mm, clip: true, width: 90%)
 
 = Testfälle
 

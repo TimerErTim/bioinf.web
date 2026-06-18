@@ -93,5 +93,5 @@ X-CSRF-Token: {{emptyCsrf}}
 
 content=
 
-?? status == 200
+?? status == 422
 ?? body includes darf nicht leer

@@ -62,13 +62,24 @@ final class AuthService
         return !empty($_SESSION['is_admin']);
     }
 
-    // Redirects unauthenticated users to login with error message
+    // Redirects unauthenticated browser navigation to login; mutating requests get 401.
     public static function requireLogin(): void
     {
-        if (!self::check()) {
+        if (self::check()) {
+            return;
+        }
+
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        if ($method === 'GET') {
             Flash::error('Bitte einloggen.');
             View::redirect('/login');
         }
+
+        Response::unauthorized('auth/login', [
+            'title' => 'Login',
+            'username' => '',
+            'errors' => ['Bitte einloggen.'],
+        ]);
     }
 
     // Only allow admin users to proceed; otherwise, show "forbidden"

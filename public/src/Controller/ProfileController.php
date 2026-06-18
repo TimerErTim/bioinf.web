@@ -107,12 +107,11 @@ final class ProfileController
         // Handles file upload and image storage, returns array with path or upload errors
         $upload = UploadService::storeImage($_FILES['avatar'] ?? [], 'avatars');
         if ($upload['errors'] !== []) { // return on error, show errors
-            View::render('profile/show', [
+            Response::unprocessable('profile/show', [
                 'title' => 'Profil',
                 'user' => $user,
                 'errors' => $upload['errors'],
             ]);
-            return;
         }
 
         if ($upload['path'] === null) {

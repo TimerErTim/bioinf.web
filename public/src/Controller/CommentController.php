@@ -123,12 +123,11 @@ final class CommentController
         $errors = ValidationService::commentContent($content);
 
         if ($errors !== []) {
-            View::render('comments/edit', [
+            Response::unprocessable('comments/edit', [
                 'title' => 'Kommentar bearbeiten',
                 'comment' => array_merge($comment, ['content' => $content]),
                 'errors' => $errors,
             ]);
-            return;
         }
 
         $this->comments->update((int) $comment['id'], $content);
@@ -177,7 +176,7 @@ final class CommentController
 
         // On validation errors, re-render form preserving entered content and errors
         if ($errors !== []) {
-            View::render('quotes/show', [
+            Response::unprocessable('quotes/show', [
                 'title' => 'Zitat von ' . $quote['speaker'],
                 'quote' => $quote,
                 'commentTree' => $this->comments->buildTree($quoteId, $commentSort, AuthService::userId()),
@@ -187,7 +186,6 @@ final class CommentController
                 'oldComment' => $content,
                 'replyToId' => $parentId,
             ]);
-            return;
         }
 
         // Persist comment (new or reply)
