@@ -77,7 +77,7 @@ trap cleanup EXIT
 git ls-files -z --cached --others --exclude-standard -- "${paths[@]}" | xargs -0 cp -t "$targetdir" --parents
 
 cd "$tmpdir"
-zip -r "$zipfile" .
+zip -X -r "$zipfile" .
 '''
 
 [tasks."fmt:typst"]
