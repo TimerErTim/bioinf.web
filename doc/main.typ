@@ -455,8 +455,8 @@ JavaScript ist bewusst auf Transport- und Komfortfunktionen beschränkt. Die Dat
 Zitate erscheinen im Feed als Karten mit Ausschnitt, Sprecher, optional Thumbnail, Kommentar- und Like-Zähler. Auf der Detailseite zeigt ein Hero-Bild (falls vorhanden) das vollständige Zitat. Kommentare werden rekursiv in `comment-tree.php` gerendert: Avatare links, Einrückung und Verbindungslinien visualisieren die Thread-Struktur. Sortierung ist sowohl im Feed (`?sort=`) als auch bei Kommentaren (`?csort=`) wählbar.
 
 #block(image(
-  "assets/cercei-quote-with-image.png"
-), radius: 2mm, clip: true, height: 10cm)
+  "assets/cercei-quote-with-image.png", height: 9cm
+), radius: 2mm, clip: true)
 
 #block(image(
   "assets/thread-display.png"
